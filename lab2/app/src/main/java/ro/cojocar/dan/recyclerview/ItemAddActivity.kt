@@ -14,8 +14,8 @@ class ItemAddActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_item_detail)
-        setSupportActionBar(detail_toolbar)
+        setContentView(R.layout.activity_item_add)
+        setSupportActionBar(add_toolbar)
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own add action", Snackbar.LENGTH_LONG)
@@ -32,8 +32,8 @@ class ItemAddActivity : AppCompatActivity() {
                 arguments = Bundle().apply {
                     putString(
                         //ItemAddFragment.ARG_ITEM_ID,"G-AAIN"
-                        ItemDetailFragment.ARG_ITEM_ID,
-                        intent.getStringExtra(ItemDetailFragment.ARG_ITEM_ID)
+                        ItemAddFragment.ARG_ITEM_ID,
+                        intent.getStringExtra(ItemAddFragment.ARG_ITEM_ID)
                     )
                 }
             }

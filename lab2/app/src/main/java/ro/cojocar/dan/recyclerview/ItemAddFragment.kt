@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_item_add.*
-import kotlinx.android.synthetic.main.activity_item_detail.*
+//import kotlinx.android.synthetic.main.activity_item_detail.*
 import kotlinx.android.synthetic.main.item_add.view.*
 import kotlinx.android.synthetic.main.item_detail.view.*
 import ro.cojocar.dan.recyclerview.dummy.DummyContent
@@ -25,7 +25,7 @@ class ItemAddFragment  : Fragment() {
                 // arguments. In a real-world scenario, use a Loader
                 // to load content from a content provider.
                 item = DummyContent.ITEM_MAP[it.getString(ARG_ITEM_ID)]
-                activity?.toolbar_layout?.title = item?.tailNumber
+                activity?.toolbar_layout_add?.title = item?.tailNumber
             }
         }
     }
@@ -34,7 +34,7 @@ class ItemAddFragment  : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.item_detail, container, false)
+        val rootView = inflater.inflate(R.layout.item_add, container, false)
 
         // Show the dummy content as text in a TextView.
         item?.let {
@@ -42,7 +42,7 @@ class ItemAddFragment  : Fragment() {
 //              "Aircraft type: "+it.aircraftType+"\n"+
 //              "Terminal: "+it.terminal+"\n"+
 //              "Gate: "+it.gate+"\n"
-            rootView.item_detail.text = "Flight code: "+it.flightCode+"\n"+"Airline: "+it.airline+"\n"+
+            rootView.item_add.text = "Flight code: "+it.flightCode+"\n"+"Airline: "+it.airline+"\n"+
                     "Aircraft type: "+it.aircraftType+"\n"+
                     "Terminal: "+it.terminal+"\n"+
                     "Gate: "+it.gate+"\n"
