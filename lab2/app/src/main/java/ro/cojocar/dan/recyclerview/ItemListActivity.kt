@@ -25,10 +25,13 @@ class ItemListActivity : AppCompatActivity() {
     setContentView(R.layout.activity_item_list)
 
     setSupportActionBar(toolbar)
-    toolbar.title = title
+//    toolbar.title = title
 
     fab.setOnClickListener { view ->
-      val intent = Intent(view.context, ItemAddActivity::class.java).apply {}
+      //val item = view.tag as DummyContent.Aircraft
+      val intent = Intent(view.context, ItemAddActivity::class.java).apply {
+        //putExtra(ItemAddFragment.ARG_ITEM_ID, item.tailNumber)
+      }
       view.context.startActivity(intent)
     }
 

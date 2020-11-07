@@ -24,12 +24,12 @@ object DummyContent {
 //    }
   }
 
-  private fun addItem(item: Aircraft) {
+  fun addItem(item: Aircraft) {
     ITEMS.add(item)
     ITEM_MAP[item.tailNumber] = item
   }
 
-  private fun createAircraftItem(tailNumber: String,aircraftType:String,airline:String,flightCode:String,terminal:String,gate:String): Aircraft {
+  fun createAircraftItem(tailNumber: String,aircraftType:String,airline:String,flightCode:String,terminal:String,gate:String): Aircraft {
     return Aircraft(tailNumber,aircraftType,airline,flightCode,terminal,gate)
   }
 
