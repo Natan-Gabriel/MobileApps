@@ -54,4 +54,5 @@ class ItemDetailFragment : Fragment() {
   companion object {
     const val ARG_ITEM_ID = "item_id"
   }
+
 }

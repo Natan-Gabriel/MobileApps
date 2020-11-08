@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NavUtils
 import com.google.android.material.snackbar.Snackbar
@@ -11,6 +12,8 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_item_detail.*
 import kotlinx.android.synthetic.main.activity_item_detail.fab
 import kotlinx.android.synthetic.main.activity_item_list.*
+import kotlinx.android.synthetic.main.item_detail.view.*
+import ro.cojocar.dan.recyclerview.dummy.DummyContent
 
 class ItemDetailActivity : AppCompatActivity() {
 
@@ -23,6 +26,16 @@ class ItemDetailActivity : AppCompatActivity() {
             Snackbar.make(view, "Replace with your own add action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
+
+//        this.toolbar_layout?.title = DummyContent.ITEM_MAP[intent.getStringExtra(ARG_ITEM_ID)]?.tailNumber
+//
+//
+//
+//        findViewById<TextView>(R.id.item_detail).text = "Flight code: "+intent.getStringExtra(ARG_ITEM_ID)+"\n"+"Airline: "+
+//                DummyContent.ITEM_MAP[intent.getStringExtra(ARG_ITEM_ID)]?.airline+"\n"
+//                "Aircraft type: "+it.aircraftType+"\n"+
+//                "Terminal: "+it.terminal+"\n"+
+//                "Gate: "+it.gate+"\n")
 
 
         // Show the Up button in the action bar.
@@ -62,4 +75,8 @@ class ItemDetailActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+
+    companion object {
+        const val ARG_ITEM_ID = "item_id"
+    }
 }

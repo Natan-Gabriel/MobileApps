@@ -3,22 +3,14 @@ package ro.cojocar.dan.recyclerview
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.Button
 import android.widget.EditText
-import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NavUtils
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_item_add.*
-import kotlinx.android.synthetic.main.activity_item_add.fab
-import kotlinx.android.synthetic.main.activity_item_list.*
 import ro.cojocar.dan.recyclerview.dummy.DummyContent
 
-//import kotlinx.android.synthetic.main.activity_item_detail.*
-//import kotlinx.android.synthetic.main.activity_item_detail.fab
-
-class ItemAddActivity : AppCompatActivity() {
-
+class ItemUpdateActivty : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_item_add)
@@ -101,6 +93,4 @@ class ItemAddActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
-
-
 }
