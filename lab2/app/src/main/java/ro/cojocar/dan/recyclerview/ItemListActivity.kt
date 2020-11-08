@@ -3,13 +3,16 @@ package ro.cojocar.dan.recyclerview
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface.OnShowListener
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.Adapter
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -39,12 +42,24 @@ class ItemListActivity : AppCompatActivity() {
 
     setupRecyclerView(item_list)
 
+       val onClickListenerDelete11: View.OnClickListener
+      onClickListenerDelete11 = View.OnClickListener { v ->
+          val item = v.tag as DummyContent.Aircraft
+          val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
+              putExtra(ItemDetailActivity.ARG_ITEM_ID, item.tailNumber)
+          }
+          Log.i("tagitemlistact",";;;"+item+";;;"+intent+";;;"+ItemDetailFragment.ARG_ITEM_ID+";;;"+item.tailNumber)
+          v.context.startActivity(intent)
+
+      }
+
 
   }
+    fun setupRecyclerView(recyclerView: RecyclerView) {
+    recyclerView.adapter = SimpleItemRecyclerViewAdapter(DummyContent.ITEMS,this,recyclerView)
 
-  private fun setupRecyclerView(recyclerView: RecyclerView) {
-    recyclerView.adapter = SimpleItemRecyclerViewAdapter(DummyContent.ITEMS,this)
-  }
+
+    }
 
 
 
@@ -52,7 +67,7 @@ class ItemListActivity : AppCompatActivity() {
 
 
   class SimpleItemRecyclerViewAdapter (
-      private val values: List<DummyContent.Aircraft>,private val context: Context
+      private val values: List<DummyContent.Aircraft>,private val context: Context, val myAdapt:RecyclerView
   ) : RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
 
     private val onClickListener: View.OnClickListener
@@ -95,23 +110,49 @@ class ItemListActivity : AppCompatActivity() {
 //                  view.context.startActivity(intent)
 //              }
 
-          val alert = AlertDialog.Builder(context)
-          alert.setTitle("Alert!")
-          alert.setMessage("Are you sure you want to delete this item?")
+//          val alert = AlertDialog.Builder(context)
+//          alert.setTitle("Alert!")
+//          alert.setMessage("Are you sure you want to delete this item?")
+//
+//          alert.setNegativeButton(
+//              "NO"
+//          ) { dialog, whichButton ->
+//
+//          }
+//          alert.setPositiveButton(
+//              "YES"
+//          ) { dialog, whichButton ->
+//              val item = v.tag as DummyContent.Aircraft
+//              Log.i("tagitemlistact",item.toString())
+//              DummyContent.deleteItem(item)
+//          }
+//
+//
+//
+//            alert.show()
 
-          alert.setNegativeButton(
-              "NO"
-          ) { dialog, whichButton ->
+            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+            val dialog: AlertDialog = builder.setTitle("Alert!")
+                .setMessage("Are you sure you want to delete this item?")
+                .setPositiveButton("YES") { dialog, whichButton ->
+                      val item = v.tag as DummyContent.Aircraft
+                      Log.i("tagitemlistact",item.toString())
+                      DummyContent.deleteItem(item)
+                      myAdapt.adapter?.notifyDataSetChanged()
+                }
+                .setNegativeButton("NO") {
+                        dialog, which -> dialog.dismiss()
+                }
+                .create()
+            dialog.show()
+//            Color.parseColor("#00e600")
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#00e600"))
 
-          }
-          alert.setPositiveButton(
-              "YES"
-          ) { dialog, whichButton ->
-              val item = v.tag as DummyContent.Aircraft
-              Log.i("tagitemlistact",item.toString())
-              DummyContent.deleteItem(item)
-          }
-          alert.show()
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#00e600"))
+
+//            setupRecyclerView(item_list)
+
+//            alert.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLUE)
 //        val item = v.tag as DummyContent.Aircraft
 //        Log.i("tagitemlistact",item.toString())
 //        DummyContent.deleteItem(item)
@@ -161,6 +202,8 @@ class ItemListActivity : AppCompatActivity() {
       with(holder.button) {
         tag = item
         setOnClickListener(onClickListenerDelete)
+
+
       }
 
 
