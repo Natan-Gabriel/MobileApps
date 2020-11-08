@@ -30,11 +30,17 @@ object DummyContent {
   }
 
   fun updateItem(item: Aircraft) {
-    var oldItem=ITEM_MAP[item.tailNumber]
-    ITEMS.remove(oldItem)
+    ITEMS.remove(item)
     ITEMS.add(item)
     ITEM_MAP[item.tailNumber] = item //tail number is PK
   }
+
+  fun deleteItem(item: Aircraft) {
+    ITEM_MAP.remove(item.tailNumber)
+    ITEMS.remove(item)
+
+  }
+
 
   fun createAircraftItem(tailNumber: String,aircraftType:String,airline:String,flightCode:String,terminal:String,gate:String): Aircraft {
     return Aircraft(tailNumber,aircraftType,airline,flightCode,terminal,gate)

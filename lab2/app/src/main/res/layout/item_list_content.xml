@@ -25,4 +25,14 @@
         android:layout_margin="@dimen/text_margin"
         android:textAppearance="?attr/textAppearanceListItem"/>
 
+    <Button
+        android:id="@+id/deleteButton"
+        android:layout_width="90dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginLeft="30dp"
+        android:background="#cc0000"
+        android:text="Delete"
+        android:textColor="#000000" />
+
 </LinearLayout>
