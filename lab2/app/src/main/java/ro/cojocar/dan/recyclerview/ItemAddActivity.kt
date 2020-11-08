@@ -43,8 +43,7 @@ class ItemAddActivity : AppCompatActivity() {
 //                //putExtra(ItemAddFragment.ARG_ITEM_ID, item.tailNumber)
 //            }
 //            view.context.startActivity(intent)
-            val text = findViewById<EditText>(R.id.tailNumberEdit)
-            val value = text.text.toString()
+
             DummyContent.addItem(
                 DummyContent.createAircraftItem(
 

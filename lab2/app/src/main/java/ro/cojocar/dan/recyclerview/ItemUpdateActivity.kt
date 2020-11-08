@@ -30,17 +30,15 @@ class ItemUpdateActivity : AppCompatActivity() {
 
         updateButton.setOnClickListener { _ ->
 
-            val text = findViewById<EditText>(R.id.tailNumberEdit)
-            val value = text.text.toString()
-            DummyContent.addItem(
+            DummyContent.updateItem(
                 DummyContent.createAircraftItem(
 
-                    findViewById<EditText>(R.id.tailNumberEdit).text.toString(),
-                    findViewById<EditText>(R.id.aircraftTypeEdit).text.toString(),
-                    findViewById<EditText>(R.id.airlineEdit).text.toString(),
-                    findViewById<EditText>(R.id.flightCodeEdit).text.toString(),
-                    findViewById<EditText>(R.id.terminalEdit).text.toString(),
-                    findViewById<EditText>(R.id.gateEdit).text.toString()
+                    intent.getStringExtra(ItemUpdateActivity.ARG_ITEM_ID),
+                    findViewById<EditText>(R.id.aircraftTypeEditUpdate).text.toString(),
+                    findViewById<EditText>(R.id.airlineEditUpdate).text.toString(),
+                    findViewById<EditText>(R.id.flightCodeEditUpdate).text.toString(),
+                    findViewById<EditText>(R.id.terminalEditUpdate).text.toString(),
+                    findViewById<EditText>(R.id.gateEditUpdate).text.toString()
                 )
             )
             NavUtils.navigateUpTo(this, Intent(this, ItemListActivity::class.java))
