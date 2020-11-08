@@ -39,6 +39,16 @@
                 android:value="ro.cojocar.dan.recyclerview.ItemListActivity" />
         </activity>
 
+        <activity
+            android:name=".ItemUpdateActivity"
+            android:label="@string/title_item_update"
+            android:parentActivityName=".ItemListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ro.cojocar.dan.recyclerview.ItemUpdateActivity" />
+        </activity>
+
     </application>
 
 </manifest>

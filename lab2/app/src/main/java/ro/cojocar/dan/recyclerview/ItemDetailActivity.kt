@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NavUtils
@@ -40,23 +41,16 @@ class ItemDetailActivity : AppCompatActivity() {
 
         // Show the Up button in the action bar.
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-//        if (savedInstanceState == null) {
-//            // Create the add fragment and add it to the activity
-//            // using a fragment transaction.
-//            val fragment = ItemDetailFragment().apply {
-//                arguments = Bundle().apply {
-//                    putString(
-//                        //ItemAddFragment.ARG_ITEM_ID,"G-AAIN"
-//                        ItemDetailFragment.ARG_ITEM_ID,
-//                        intent.getStringExtra(ItemDetailFragment.ARG_ITEM_ID)
-//                    )
-//                }
-//            }
-//
-//            supportFragmentManager.beginTransaction()
-//                .add(R.id.item_detail_container, fragment)
-//                .commit()
-//        }
+
+        updateButtonInDetail.setOnClickListener { v ->
+
+//            val item = v.tag as DummyContent.Aircraft
+            val intent = Intent(v.context, ItemUpdateActivity::class.java).apply {
+                putExtra(ItemUpdateActivity.ARG_ITEM_ID, intent.getStringExtra(ARG_ITEM_ID))
+            }
+//            Log.i("tagitemlistact",";;;"+item+";;;"+intent+";;;"+ItemDetailFragment.ARG_ITEM_ID+";;;"+item.tailNumber)
+            v.context.startActivity(intent)
+        }
 
     }
 
