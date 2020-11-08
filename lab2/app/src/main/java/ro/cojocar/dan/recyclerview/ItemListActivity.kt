@@ -56,7 +56,7 @@ class ItemListActivity : AppCompatActivity() {
 
         val item = v.tag as DummyContent.Aircraft
         val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
-          putExtra(ItemDetailFragment.ARG_ITEM_ID, item.tailNumber)
+          putExtra(ItemDetailActivity.ARG_ITEM_ID, item.tailNumber)
         }
         Log.i("tagitemlistact",";;;"+item+";;;"+intent+";;;"+ItemDetailFragment.ARG_ITEM_ID+";;;"+item.tailNumber)
         v.context.startActivity(intent)

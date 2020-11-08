@@ -27,36 +27,36 @@ class ItemDetailActivity : AppCompatActivity() {
                 .setAction("Action", null).show()
         }
 
-//        this.toolbar_layout?.title = DummyContent.ITEM_MAP[intent.getStringExtra(ARG_ITEM_ID)]?.tailNumber
-//
-//
-//
-//        findViewById<TextView>(R.id.item_detail).text = "Flight code: "+intent.getStringExtra(ARG_ITEM_ID)+"\n"+"Airline: "+
-//                DummyContent.ITEM_MAP[intent.getStringExtra(ARG_ITEM_ID)]?.airline+"\n"
-//                "Aircraft type: "+it.aircraftType+"\n"+
-//                "Terminal: "+it.terminal+"\n"+
-//                "Gate: "+it.gate+"\n")
+        this.toolbar_layout?.title = DummyContent.ITEM_MAP[intent.getStringExtra(ARG_ITEM_ID)]?.tailNumber
+
+
+
+        findViewById<TextView>(R.id.item_detail).text = "Flight code: "+DummyContent.ITEM_MAP[intent.getStringExtra(ARG_ITEM_ID)]?.flightCode+"\n"+
+                "Airline: "+ DummyContent.ITEM_MAP[intent.getStringExtra(ARG_ITEM_ID)]?.airline+"\n" +
+                "Aircraft type: "+DummyContent.ITEM_MAP[intent.getStringExtra(ARG_ITEM_ID)]?.aircraftType+"\n"+
+                "Terminal: "+DummyContent.ITEM_MAP[intent.getStringExtra(ARG_ITEM_ID)]?.terminal+"\n"+
+                "Gate: "+DummyContent.ITEM_MAP[intent.getStringExtra(ARG_ITEM_ID)]?.gate+"\n"
 
 
         // Show the Up button in the action bar.
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        if (savedInstanceState == null) {
-            // Create the add fragment and add it to the activity
-            // using a fragment transaction.
-            val fragment = ItemDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putString(
-                        //ItemAddFragment.ARG_ITEM_ID,"G-AAIN"
-                        ItemDetailFragment.ARG_ITEM_ID,
-                        intent.getStringExtra(ItemDetailFragment.ARG_ITEM_ID)
-                    )
-                }
-            }
-
-            supportFragmentManager.beginTransaction()
-                .add(R.id.item_detail_container, fragment)
-                .commit()
-        }
+//        if (savedInstanceState == null) {
+//            // Create the add fragment and add it to the activity
+//            // using a fragment transaction.
+//            val fragment = ItemDetailFragment().apply {
+//                arguments = Bundle().apply {
+//                    putString(
+//                        //ItemAddFragment.ARG_ITEM_ID,"G-AAIN"
+//                        ItemDetailFragment.ARG_ITEM_ID,
+//                        intent.getStringExtra(ItemDetailFragment.ARG_ITEM_ID)
+//                    )
+//                }
+//            }
+//
+//            supportFragmentManager.beginTransaction()
+//                .add(R.id.item_detail_container, fragment)
+//                .commit()
+//        }
 
     }
 

@@ -26,7 +26,7 @@ object DummyContent {
 
   fun addItem(item: Aircraft) {
     ITEMS.add(item)
-    ITEM_MAP[item.tailNumber] = item
+    ITEM_MAP[item.tailNumber] = item //tail number is PK
   }
 
   fun createAircraftItem(tailNumber: String,aircraftType:String,airline:String,flightCode:String,terminal:String,gate:String): Aircraft {
