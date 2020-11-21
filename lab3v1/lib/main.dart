@@ -17,7 +17,26 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// One entry in the multilevel list displayed by this app.
+class Entry {
+  Entry(this.title, [this.children = const <Entry>[]]);
 
+  final String title;
+  final List<Entry> children;
+}
+
+
+class Aircraft {
+  Aircraft(this.tailNumber, this.aircraftType,this.airline,this.flightCode,this.terminal,this.gate);
+
+  final String tailNumber;
+  final String aircraftType;
+  final String airline;
+  final String flightCode;
+  final String terminal;
+  final String gate;
+
+}
 
 class RandomWords extends StatefulWidget {
   @override
@@ -25,7 +44,13 @@ class RandomWords extends StatefulWidget {
 }
 
 class _RandomWordsState extends State<RandomWords> {
-  final List<WordPair> _suggestions = <WordPair>[];  
+  final List<Aircraft> _aircrafts = [Aircraft("G-AAIN","Airbus A320","British Airways","BA0751","Terminal 4","D04"),
+                          Aircraft("G-AWIN","Airbus A380","Air France","AF0051","Terminal 4","D05"),
+                          Aircraft("G-TYIN","Airbus A330","British Airways","BA0701","Terminal 2","B04"),
+                          Aircraft("G-TRIN","Airbus A350","Wizz Air","W60251","Terminal 5","E04"),
+                          Aircraft("G-AAEE","Airbus A310","American Airlines","AA0791","Terminal 3","C04"),
+                          Aircraft("A-AHGF","Airbus A340","KLM","KL0051","Terminal 4","D06")];  
+  final List<WordPair> _suggestions = <WordPair>[];
   final _saved = Set<WordPair>();     // NEW          // NEW
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
   @override
@@ -78,6 +103,7 @@ class _RandomWordsState extends State<RandomWords> {
     Widget _buildSuggestions() {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
+       itemCount: 30,
       // The itemBuilder callback is called once per suggested 
       // word pairing, and places each suggestion into a ListTile
       // row. For even rows, the function adds a ListTile row for
