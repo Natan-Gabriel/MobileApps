@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
+import 'package:flutter/services.dart';
 
 void main() => runApp(MyApp());
 
@@ -8,9 +9,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // final wordPair = WordPair.random(); // Add this line.
     return MaterialApp(
-      title: 'Startup Name Generator',
+      title: 'Airport Manager',
       theme: ThemeData(          // Add the 3 lines from here... 
-        primaryColor: Colors.white,
+        primaryColor: Colors.green,
       ),                         // ... to here.
       home: RandomWords(),
     );
@@ -51,22 +52,151 @@ class _RandomWordsState extends State<RandomWords> {
                           Aircraft("G-AAEE","Airbus A310","American Airlines","AA0791","Terminal 3","C04"),
                           Aircraft("A-AHGF","Airbus A340","KLM","KL0051","Terminal 4","D06")];  
   final List<WordPair> _suggestions = <WordPair>[];
-  final _saved = Set<WordPair>();     // NEW          // NEW
+  final _saved = Set<Aircraft>();     // NEW          // NEW
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
+
+  
+
   @override
   Widget build(BuildContext context) {
     // final wordPair = WordPair.random();      // NEW
     // return Text(wordPair.asPascalCase);      // NEW
     return Scaffold (                     // Add from here... 
       appBar: AppBar(
-        title: Text('Startup Name Generator'),
+        title: Text('Airport Manager'),
         actions: [
           IconButton(icon: Icon(Icons.list), onPressed: _pushSaved),
         ],
       ),
       body: _buildSuggestions(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _add,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ),
     );                                      // ... to here.
   }
+
+  void _add(){
+    Navigator.of(context).push(
+        MaterialPageRoute<void>(
+        // NEW lines from here...
+        builder: (BuildContext context) {
+          final tiles = _saved.map(
+            (Aircraft pair) {
+              return ListTile(
+                title: Text(
+                  pair.flightCode+"    "+
+                  pair.terminal+"    "+
+                  pair.gate,
+                  
+                  style: _biggerFont,
+                ),
+              );
+            },
+          );
+          final divided = ListTile.divideTiles(
+            context: context,
+            tiles: tiles,
+          ).toList();
+
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Add an aircraft'),
+            ),
+            // body:  RichText(
+            //         text: TextSpan(
+            //           children: <TextSpan>[
+            //             TextSpan(text: 'hello', style: _biggerFont ,color:Colors.black ),
+            //             TextSpan(text: ' world', style: TextStyle(color: Colors.blue)),
+            //           ],
+            //         ),
+            //       ),
+            body: new Padding(
+            padding: new EdgeInsets.all(30.0),
+            child:Column(children: <Widget>[
+              Row(children:[
+                Text("BA0751",style:  _biggerFont)  ,
+                Text("Hello",style: _biggerFont)   ]
+            ),
+              Row(children:[
+                Text("Hello",style:  _biggerFont)  ,
+                Text("Hello",style: _biggerFont)   ]
+            ),
+         
+           Flexible(
+            child:  TextField(
+              decoration: const InputDecoration(helperText: "Enter App ID"),
+              
+            ),
+          ),
+    
+          Flexible(
+            child:
+          TextField(
+         
+          onSubmitted: (String value) async {
+            await showDialog<void>(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Thanks!'),
+                  content: Text('You typed "$value".'),
+                  actions: <Widget>[
+                    FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
+            )
+        
+            ])
+           
+            )
+          );
+        }, // ...to here.
+      ),
+  );
+  }
+
+// Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Center(
+//         child: TextField(
+//           controller: _controller,
+//           onSubmitted: (String value) async {
+//             await showDialog<void>(
+//               context: context,
+//               builder: (BuildContext context) {
+//                 return AlertDialog(
+//                   title: const Text('Thanks!'),
+//                   content: Text('You typed "$value".'),
+//                   actions: <Widget>[
+//                     FlatButton(
+//                       onPressed: () {
+//                         Navigator.pop(context);
+//                       },
+//                       child: const Text('OK'),
+//                     ),
+//                   ],
+//                 );
+//               },
+//             );
+//           },
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+
 
     void _pushSaved() {
       Navigator.of(context).push(
@@ -74,10 +204,13 @@ class _RandomWordsState extends State<RandomWords> {
         // NEW lines from here...
         builder: (BuildContext context) {
           final tiles = _saved.map(
-            (WordPair pair) {
+            (Aircraft pair) {
               return ListTile(
                 title: Text(
-                  pair.asPascalCase,
+                  pair.flightCode+"    "+
+                  pair.terminal+"    "+
+                  pair.gate,
+                  
                   style: _biggerFont,
                 ),
               );
@@ -103,7 +236,7 @@ class _RandomWordsState extends State<RandomWords> {
     Widget _buildSuggestions() {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-       itemCount: 30,
+       itemCount: _aircrafts.length*2,
       // The itemBuilder callback is called once per suggested 
       // word pairing, and places each suggestion into a ListTile
       // row. For even rows, the function adds a ListTile row for
@@ -130,16 +263,18 @@ class _RandomWordsState extends State<RandomWords> {
           // suggestions list.
           _suggestions.addAll(generateWordPairs().take(10));
         }
-        return _buildRow(_suggestions[index]);
+        return _buildRow(_aircrafts[index]);
       }
     );
   }
 
-  Widget _buildRow(WordPair pair) {
+  Widget _buildRow(Aircraft pair) {
     final alreadySaved = _saved.contains(pair);  // NEW
     return ListTile(
       title: Text(
-        pair.asPascalCase,
+        pair.flightCode+"    "+
+        pair.terminal+"    "+
+        pair.gate,
         style: _biggerFont,
       ),
       trailing: Icon(   // NEW from here... 
