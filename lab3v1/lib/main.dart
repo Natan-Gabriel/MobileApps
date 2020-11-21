@@ -55,6 +55,13 @@ class _RandomWordsState extends State<RandomWords> {
   final _saved = Set<Aircraft>();     // NEW          // NEW
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
 
+  final flightCodeController = TextEditingController();
+  final tailNumberController = TextEditingController();
+  final airlineController = TextEditingController();
+  final aircraftTypeController = TextEditingController();
+  final terminalController = TextEditingController();
+  final gateController = TextEditingController();
+
   
 
   @override
@@ -95,10 +102,7 @@ class _RandomWordsState extends State<RandomWords> {
               );
             },
           );
-          final divided = ListTile.divideTiles(
-            context: context,
-            tiles: tiles,
-          ).toList();
+      
 
           return Scaffold(
             appBar: AppBar(
@@ -114,22 +118,55 @@ class _RandomWordsState extends State<RandomWords> {
             //       ),
             body: new Padding(
             padding: new EdgeInsets.all(30.0),
-            child:Column(children: <Widget>[
+            child:Column(
+              
+              children: <Widget>[
               Row(children:[
                 Text("BA0751",style:  _biggerFont)  ,
                 Text("Hello",style: _biggerFont)   ]
             ),
-              Row(children:[
-                Text("Hello",style:  _biggerFont)  ,
-                Text("Hello",style: _biggerFont)   ]
+             
+            Text("Flight code",style:  _biggerFont) ,
+            Flexible(
+              child:  TextField(
+                controller: flightCodeController,          
+              ),
             ),
-         
-           Flexible(
-            child:  TextField(
-              decoration: const InputDecoration(helperText: "Enter App ID"),
-              
+
+            Text("Tail number",style:  _biggerFont) ,
+            Flexible(
+              child:  TextField(
+                controller: tailNumberController,          
+              ),
             ),
-          ),
+
+            Text("Airline",style:  _biggerFont) ,
+            Flexible(
+              child:  TextField(
+                controller: airlineController,          
+              ),
+            ),
+            
+            Text("Aircraft type",style:  _biggerFont) ,
+            Flexible(
+              child:  TextField(
+                controller: aircraftTypeController,          
+              ),
+            ),
+
+            Text("Terminal",style:  _biggerFont) ,
+            Flexible(
+              child:  TextField(
+                controller: terminalController,          
+              ),
+            ),
+
+            Text("Gate",style:  _biggerFont) ,
+            Flexible(
+              child:  TextField(
+                controller: gateController,          
+              ),
+            ),
     
           Flexible(
             child:
@@ -141,7 +178,7 @@ class _RandomWordsState extends State<RandomWords> {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: const Text('Thanks!'),
-                  content: Text('You typed "$value".'),
+                  content: Text(flightCodeController.text),//Text('You typed "$value".'),
                   actions: <Widget>[
                     FlatButton(
                       onPressed: () {
@@ -155,8 +192,20 @@ class _RandomWordsState extends State<RandomWords> {
             );
           },
         ),
-            )
+            ),
+
         
+            FlatButton(
+              onPressed: () {
+               setState(() => _aircrafts.add(Aircraft(tailNumberController.text,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text)));               
+              
+                Navigator.pop(context);//
+              },
+              child: Text(
+                "Flat Button",
+              ),
+            )
+          
             ])
            
             )
@@ -166,35 +215,6 @@ class _RandomWordsState extends State<RandomWords> {
   );
   }
 
-// Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Center(
-//         child: TextField(
-//           controller: _controller,
-//           onSubmitted: (String value) async {
-//             await showDialog<void>(
-//               context: context,
-//               builder: (BuildContext context) {
-//                 return AlertDialog(
-//                   title: const Text('Thanks!'),
-//                   content: Text('You typed "$value".'),
-//                   actions: <Widget>[
-//                     FlatButton(
-//                       onPressed: () {
-//                         Navigator.pop(context);
-//                       },
-//                       child: const Text('OK'),
-//                     ),
-//                   ],
-//                 );
-//               },
-//             );
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 
 
