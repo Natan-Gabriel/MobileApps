@@ -36,15 +36,13 @@ class _RandomWordsState extends State<RandomWords> {
     return Scaffold (                     // Add from here... 
       appBar: AppBar(
         title: Text('Airport Manager'),
-        actions: [
-          IconButton(icon: Icon(Icons.list), onPressed: _pushSaved),
-        ],
+        
       ),
-      body: _buildSuggestions(),
+      body: _buildAircrafts(),
       floatingActionButton: FloatingActionButton(
         onPressed: _add,
         tooltip: 'Increment',
-        child: const Icon(Icons.add),backgroundColor: Colors.red,
+        child: const Icon(Icons.add),backgroundColor: Colors.green,
       ),
     );                                      // ... to here.
   }
@@ -104,11 +102,7 @@ class _RandomWordsState extends State<RandomWords> {
   );
 }
 
-  void _delete(Aircraft aircraft) {
-    setState(() => _aircrafts.remove(aircraft)); 
-  }
-
-
+ 
   void _detail(Aircraft aircraft) async{
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the AddPage Screen.
@@ -122,42 +116,7 @@ class _RandomWordsState extends State<RandomWords> {
     }
   }
 
-    void _pushSaved() {
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-        // NEW lines from here...
-        builder: (BuildContext context) {
-          final tiles = _saved.map(
-            (Aircraft pair) {
-              return ListTile(
-                title: Text(
-                  pair.flightCode+"    "+
-                  pair.terminal+"    "+
-                  pair.gate,
-                  
-                  style: _biggerFont,
-                ),
-              );
-            },
-          );
-          final divided = ListTile.divideTiles(
-            context: context,
-            tiles: tiles,
-          ).toList();
-
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Saved Suggestions'),
-            ),
-            body: ListView(children: divided),
-          );
-        }, // ...to here.
-      ),
-  );
-  }
-
-
-    Widget _buildSuggestions() {
+    Widget _buildAircrafts() {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
        itemCount: _aircrafts.length*2,
@@ -173,15 +132,9 @@ class _RandomWordsState extends State<RandomWords> {
         if (i.isOdd) {
           return Divider();
         }
-
         // The syntax "i ~/ 2" divides i by 2 and returns an 
         // integer result.
-        // For example: 1, 2, 3, 4, 5 becomes 0, 1, 1, 2, 2.
-        // This calculates the actual number of word pairings 
-        // in the ListView,minus the divider widgets.
         final int index = i ~/ 2;
-        // If you've reached the end of the available word
-        // pairings...
         return _buildRow(_aircrafts[index]);
       }
     );
@@ -205,7 +158,7 @@ class _RandomWordsState extends State<RandomWords> {
               color: Colors.red,
             ),
 
-      onTap: () {      // NEW lines from here...
+      onTap: () {      
         _detail(pair);
     },
 
