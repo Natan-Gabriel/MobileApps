@@ -118,7 +118,7 @@ class _RandomWordsState extends State<RandomWords> {
                   
                 ));
     if(resultAircraft!=null){
-      setState(() => _aircrafts.add(aircraft)); 
+      setState(() => _aircrafts[_aircrafts.indexOf(aircraft)] = resultAircraft); 
     }
   }
 

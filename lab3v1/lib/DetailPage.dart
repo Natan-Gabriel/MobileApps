@@ -17,7 +17,7 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget._aircraft.flightCode) , 
+        title: Text(widget._aircraft.tailNumber) , 
         
         // toolbarHeight: 200,
         

@@ -26,7 +26,7 @@ class _DetailWidgetState extends State<DetailWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
              
-            Text("Tail number: "+widget._aircraft.tailNumber,style:  _biggerFont) ,
+            Text("Flight code: "+widget._aircraft.flightCode,style:  _biggerFont) ,
 
             Text("Airline: "+widget._aircraft.airline,style:  _biggerFont) ,
             
@@ -43,14 +43,14 @@ class _DetailWidgetState extends State<DetailWidget> {
                 // widget._aircrafts.add(aircraft); 
                 // widget.notifyParent();
                 // Navigator.pop(context);
-                // _update(widget._aircraft); 
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) =>
-                     UpdatePage(widget._aircraft)
+                _update(widget._aircraft); 
+                // Navigator.push(context, MaterialPageRoute(
+                //   builder: (context) =>
+                //      UpdatePage(widget._aircraft)
                   
-                ));
+                // ));
               
-                //Navigator.pop(context);//
+                // Navigator.pop(context);//
               },
               child: Text(
                 "Update",
@@ -65,7 +65,7 @@ class _DetailWidgetState extends State<DetailWidget> {
             );
   }
 
-  Future<Aircraft> _update(Aircraft aircraft) async{
+  void _update(Aircraft aircraft) async{
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the AddPage Screen.
     final Aircraft resultAircraft=await Navigator.push(context, MaterialPageRoute(
@@ -73,7 +73,9 @@ class _DetailWidgetState extends State<DetailWidget> {
                      UpdatePage(aircraft)
                   
                 ));
-    return resultAircraft;
+    if(resultAircraft!=null){//somehow optional
+      Navigator.pop(context,resultAircraft);
+    }
   }
 
 
