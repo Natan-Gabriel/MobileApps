@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'Aircraft.dart';
 
+
 class AddWidget extends StatefulWidget {
+
+
 
   final List<Aircraft> _aircrafts;
 
@@ -107,9 +110,12 @@ class _AddWidgetState extends State<AddWidget> {
         
             FlatButton(
               onPressed: () {
-              setState(() => widget._aircrafts.add(Aircraft(tailNumberController.text,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text)));               
+                setState(() => widget._aircrafts.add(Aircraft(tailNumberController.text,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text))); 
+                // widget.notifyParent();
+                Navigator.pop(context);
+                            
               
-                Navigator.pop(context);//
+                //Navigator.pop(context);//
               },
               child: Text(
                 "Flat Button",

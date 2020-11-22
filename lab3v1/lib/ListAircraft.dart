@@ -19,14 +19,13 @@ class _RandomWordsState extends State<RandomWords> {
   final _saved = Set<Aircraft>();     // NEW          // NEW
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
 
-  final flightCodeController = TextEditingController();
-  final tailNumberController = TextEditingController();
-  final airlineController = TextEditingController();
-  final aircraftTypeController = TextEditingController();
-  final terminalController = TextEditingController();
-  final gateController = TextEditingController();
-
   
+  refresh() {
+    setState(() {});
+  }
+  
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -48,125 +47,45 @@ class _RandomWordsState extends State<RandomWords> {
     );                                      // ... to here.
   }
 
-  void _add(){
-    Navigator.of(context).push(
-        MaterialPageRoute<void>(
-        // NEW lines from here...
-        builder: (BuildContext context) {
-          return AddPage(_aircrafts);
-          // return Scaffold(
-          //   appBar: AppBar(
-          //     title: Text('Add an aircraft'),
-          //   ),
-            // body:  RichText(
-            //         text: TextSpan(
-            //           children: <TextSpan>[
-            //             TextSpan(text: 'hello', style: _biggerFont ,color:Colors.black ),
-            //             TextSpan(text: ' world', style: TextStyle(color: Colors.blue)),
-            //           ],
-            //         ),
-            //       ),
-        //     body: new Padding(
-        //     padding: new EdgeInsets.all(30.0),
-        //     child:Column(
-              
-        //       children: <Widget>[
-        //       Row(children:[
-        //         Text("BA0751",style:  _biggerFont)  ,
-        //         Text("Hello",style: _biggerFont)   ]
-        //     ),
-             
-        //     Text("Flight code",style:  _biggerFont) ,
-        //     Flexible(
-        //       child:  TextField(
-        //         controller: flightCodeController,          
-        //       ),
-        //     ),
-
-        //     Text("Tail number",style:  _biggerFont) ,
-        //     Flexible(
-        //       child:  TextField(
-        //         controller: tailNumberController,          
-        //       ),
-        //     ),
-
-        //     Text("Airline",style:  _biggerFont) ,
-        //     Flexible(
-        //       child:  TextField(
-        //         controller: airlineController,          
-        //       ),
-        //     ),
-            
-        //     Text("Aircraft type",style:  _biggerFont) ,
-        //     Flexible(
-        //       child:  TextField(
-        //         controller: aircraftTypeController,          
-        //       ),
-        //     ),
-
-        //     Text("Terminal",style:  _biggerFont) ,
-        //     Flexible(
-        //       child:  TextField(
-        //         controller: terminalController,          
-        //       ),
-        //     ),
-
-        //     Text("Gate",style:  _biggerFont) ,
-        //     Flexible(
-        //       child:  TextField(
-        //         controller: gateController,          
-        //       ),
-        //     ),
-    
-        //   Flexible(
-        //     child:
-        //   TextField(
-         
-        //   onSubmitted: (String value) async {
-        //     await showDialog<void>(
-        //       context: context,
-        //       builder: (BuildContext context) {
-        //         return AlertDialog(
-        //           title: const Text('Thanks!'),
-        //           content: Text(flightCodeController.text),//Text('You typed "$value".'),
-        //           actions: <Widget>[
-        //             FlatButton(
-        //               onPressed: () {
-        //                 Navigator.pop(context);
-        //               },
-        //               child: const Text('OK'),
-        //             ),
-        //           ],
-        //         );
-        //       },
-        //     );
-        //   },
-        // ),
-        //     ),
-
-        
-        //     FlatButton(
-        //       onPressed: () {
-        //        setState(() => _aircrafts.add(Aircraft(tailNumberController.text,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text)));               
-              
-        //         Navigator.pop(context);//
-        //       },
-        //       child: Text(
-        //         "Flat Button",
-        //       ),
-        //     )
-          
-        //     ])
-           
-        //     )
-          // );
-        }, // ...to here.
-      ),
-  );
+  void updateListView() async {
+    setState(() => {});
   }
 
+  void _add() async{
+    
+   
+      
+    // Navigator.of(context).push(
+    //     MaterialPageRoute<void>(
+        // NEW lines from here...
+        
+        
+        // builder: (BuildContext context) {
+          
+        //   return  new AddPage(_aircrafts);
+        //     // setState(() => 1);
+        
+        // }
+     
+        
+        //  ...to here.
+  //     )
+  //     //  _aircrafts.add(Aircraft("G-AAIN","Airbus A320","British Airways","BA0751","Terminal 4","D04"));
+  // )  , 
+  
+  
+  // _aircrafts.add(Aircraft(_aircrafts.length.toString(),"Airbus A320","British Airways",_aircrafts.length.toString(),"Terminal 4","D04"))
+  // });
+   await Navigator.push(context, MaterialPageRoute(
+                  builder: (context) =>
+                     AddPage(_aircrafts)
+                  
+                ));
+        
+   
 
-
+    await updateListView();
+  }
 
     void _pushSaved() {
       Navigator.of(context).push(
@@ -228,18 +147,13 @@ class _RandomWordsState extends State<RandomWords> {
         final int index = i ~/ 2;
         // If you've reached the end of the available word
         // pairings...
-        if (index >= _suggestions.length) {
-          // ...then generate 10 more and add them to the 
-          // suggestions list.
-          _suggestions.addAll(generateWordPairs().take(10));
-        }
         return _buildRow(_aircrafts[index]);
       }
     );
   }
 
   Widget _buildRow(Aircraft pair) {
-    final alreadySaved = _saved.contains(pair);  // NEW
+
     return ListTile(
       title: Text(
         pair.flightCode+"    "+
@@ -247,19 +161,19 @@ class _RandomWordsState extends State<RandomWords> {
         pair.gate,
         style: _biggerFont,
       ),
-      trailing: Icon(   // NEW from here... 
-        alreadySaved ? Icons.favorite : Icons.favorite_border,
-        color: alreadySaved ? Colors.red : null,
-    ),                // ... to here.
-    onTap: () {      // NEW lines from here...
-      setState(() {
-        if (alreadySaved) {
-          _saved.remove(pair);
-        } else { 
-          _saved.add(pair); 
-        } 
-      });
-    },               // ... to here.
+
+      trailing: FlatButton(
+              onPressed: () {
+              // setState(() => _aircrafts.add(Aircraft(tailNumberController.text,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text)));               
+              
+              //   Navigator.pop(context);//
+              _add();
+              },
+              child: Text(
+                "Flat Button",
+              ),
+            )
+              
     );
   }
 
