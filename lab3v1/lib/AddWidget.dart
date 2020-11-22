@@ -95,7 +95,7 @@ class _AddWidgetState extends State<AddWidget> {
                   actions: <Widget>[
                     FlatButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pop(context,widget._aircrafts);
                       },
                       child: const Text('OK'),
                     ),
@@ -110,15 +110,17 @@ class _AddWidgetState extends State<AddWidget> {
         
             FlatButton(
               onPressed: () {
-                setState(() => widget._aircrafts.add(Aircraft(tailNumberController.text,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text))); 
+                // setState(() => widget._aircrafts.add(Aircraft(tailNumberController.text,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text))); 
+                Aircraft aircraft=Aircraft(tailNumberController.text,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text);
+                // widget._aircrafts.add(aircraft); 
                 // widget.notifyParent();
-                Navigator.pop(context);
+                Navigator.pop(context,aircraft);
                             
               
                 //Navigator.pop(context);//
               },
               child: Text(
-                "Flat Button",
+                "Add",
               ),
             )
           

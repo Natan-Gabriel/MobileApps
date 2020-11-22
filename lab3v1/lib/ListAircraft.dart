@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'Aircraft.dart';
 import 'AddPage.dart';
 import 'package:english_words/english_words.dart';
+import 'DeletePage.dart';
 
 class RandomWords extends StatefulWidget {
   @override
@@ -42,7 +43,7 @@ class _RandomWordsState extends State<RandomWords> {
       floatingActionButton: FloatingActionButton(
         onPressed: _add,
         tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add),backgroundColor: Colors.red,
       ),
     );                                      // ... to here.
   }
@@ -52,39 +53,58 @@ class _RandomWordsState extends State<RandomWords> {
   }
 
   void _add() async{
-    
-   
-      
-    // Navigator.of(context).push(
-    //     MaterialPageRoute<void>(
-        // NEW lines from here...
-        
-        
-        // builder: (BuildContext context) {
-          
-        //   return  new AddPage(_aircrafts);
-        //     // setState(() => 1);
-        
-        // }
-     
-        
-        //  ...to here.
-  //     )
-  //     //  _aircrafts.add(Aircraft("G-AAIN","Airbus A320","British Airways","BA0751","Terminal 4","D04"));
-  // )  , 
-  
-  
-  // _aircrafts.add(Aircraft(_aircrafts.length.toString(),"Airbus A320","British Airways",_aircrafts.length.toString(),"Terminal 4","D04"))
-  // });
-   await Navigator.push(context, MaterialPageRoute(
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the AddPage Screen.
+    final Aircraft aircraft=await Navigator.push(context, MaterialPageRoute(
                   builder: (context) =>
                      AddPage(_aircrafts)
                   
                 ));
-        
-   
+    if(aircraft!=null){
+      setState(() => _aircrafts.add(aircraft)); 
+    }
+  }
 
-    await updateListView();
+  Future<void> _showMyDialog(Aircraft aircraft) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      
+      return AlertDialog(
+        title: Text('Alert!'),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text('Are you sure you want to delete this item?'),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('NO'),
+            
+            onPressed: () {
+              Navigator.of(context).pop();
+               
+            },
+            
+          ),
+          TextButton(
+            child: Text('YES'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              setState(() => _aircrafts.remove(aircraft));
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+  void _delete(Aircraft aircraft) {
+    setState(() => _aircrafts.remove(aircraft)); 
   }
 
     void _pushSaved() {
@@ -163,17 +183,17 @@ class _RandomWordsState extends State<RandomWords> {
       ),
 
       trailing: FlatButton(
-              onPressed: () {
-              // setState(() => _aircrafts.add(Aircraft(tailNumberController.text,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text)));               
-              
-              //   Navigator.pop(context);//
-              _add();
-              },
+              onPressed: () { _showMyDialog(pair); },
               child: Text(
-                "Flat Button",
+                "Delete",
               ),
-            )
-              
+              color: Colors.red,
+            ),
+
+      onTap: () {      // NEW lines from here...
+        _delete(pair);
+    },
+
     );
   }
 
