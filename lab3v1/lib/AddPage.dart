@@ -8,7 +8,7 @@ class AddPage extends StatefulWidget {
 
   final List<Aircraft> _aircrafts;
 
-   AddPage(this._aircrafts);
+  AddPage(this._aircrafts);
 
  
 

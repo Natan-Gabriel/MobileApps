@@ -2,25 +2,21 @@ import 'package:flutter/material.dart';
 import 'Aircraft.dart';
 
 
-class AddWidget extends StatefulWidget {
+class UpdateWidget extends StatefulWidget {
 
+  final Aircraft _aircraft;
 
-
-  final List<Aircraft> _aircrafts;
-
-  AddWidget(this._aircrafts);
-
+  UpdateWidget(this._aircraft);
 
   @override
-  _AddWidgetState createState() => _AddWidgetState();
+  _UpdateWidgetState createState() => _UpdateWidgetState();
 }
 
-class _AddWidgetState extends State<AddWidget> {
+class _UpdateWidgetState extends State<UpdateWidget> {
 
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
 
   final flightCodeController = TextEditingController();
-  final tailNumberController = TextEditingController();
   final airlineController = TextEditingController();
   final aircraftTypeController = TextEditingController();
   final terminalController = TextEditingController();
@@ -36,20 +32,23 @@ class _AddWidgetState extends State<AddWidget> {
               
               children: <Widget>[  
 
-            Text("Flight code",style:  _biggerFont) ,
+            Text("Tail number: "+widget._aircraft.tailNumber,style:  _biggerFont) ,
+
+            Padding(padding:new EdgeInsets.only(top: 10),child:Text("Flight code",style:  _biggerFont) ),
+            // Text("Flight code",style:  _biggerFont) ,
             Flexible(
               child:  TextField(
                 controller: flightCodeController,          
               ),
             ),
 
-            Padding(padding:new EdgeInsets.only(top: 10),child:Text("Tail number",style:  _biggerFont) ),
-            // Text("Tail number",style:  _biggerFont) ,
-            Flexible(
-              child:  TextField(
-                controller: tailNumberController,          
-              ),
-            ),
+            // Padding(padding:new EdgeInsets.only(top: 10),child:Text("Tail number",style:  _biggerFont) ),
+            // // Text("Tail number",style:  _biggerFont) ,
+            // Flexible(
+            //   child:  TextField(
+            //     controller: tailNumberController,          
+            //   ),
+            // ),
 
             Padding(padding:new EdgeInsets.only(top: 10),child:Text("Airline",style:  _biggerFont) ),
             // Text("Airline",style:  _biggerFont) ,
@@ -85,17 +84,13 @@ class _AddWidgetState extends State<AddWidget> {
 
             FlatButton(
               onPressed: () {
-                // setState(() => widget._aircrafts.add(Aircraft(tailNumberController.text,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text))); 
-                Aircraft aircraft=Aircraft(tailNumberController.text,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text);
+                Aircraft aircraft=Aircraft(widget._aircraft.tailNumber,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text);
                 // widget._aircrafts.add(aircraft); 
                 // widget.notifyParent();
                 Navigator.pop(context,aircraft);
-                            
-              
-                //Navigator.pop(context);//
               },
               child: Text(
-                "Add",
+                "UPDATE",
               ),
               color: Colors.green,
             )

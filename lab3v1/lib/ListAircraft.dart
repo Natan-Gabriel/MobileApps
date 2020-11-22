@@ -3,6 +3,7 @@ import 'Aircraft.dart';
 import 'AddPage.dart';
 import 'package:english_words/english_words.dart';
 import 'DeletePage.dart';
+import 'DetailPage.dart';
 
 class RandomWords extends StatefulWidget {
   @override
@@ -107,6 +108,20 @@ class _RandomWordsState extends State<RandomWords> {
     setState(() => _aircrafts.remove(aircraft)); 
   }
 
+
+  void _detail(Aircraft aircraft) async{
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the AddPage Screen.
+    final Aircraft resultAircraft=await Navigator.push(context, MaterialPageRoute(
+                  builder: (context) =>
+                     DetailPage(aircraft)
+                  
+                ));
+    if(resultAircraft!=null){
+      setState(() => _aircrafts.add(aircraft)); 
+    }
+  }
+
     void _pushSaved() {
       Navigator.of(context).push(
         MaterialPageRoute<void>(
@@ -191,7 +206,7 @@ class _RandomWordsState extends State<RandomWords> {
             ),
 
       onTap: () {      // NEW lines from here...
-        _delete(pair);
+        _detail(pair);
     },
 
     );
