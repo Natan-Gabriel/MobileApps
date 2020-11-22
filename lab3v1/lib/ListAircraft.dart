@@ -81,16 +81,17 @@ class _RandomWordsState extends State<RandomWords> {
         ),
         actions: <Widget>[
           TextButton(
-            child: Text('NO'),
+            child: Text('NO',style: new TextStyle(color: Colors.green)),
             
             onPressed: () {
               Navigator.of(context).pop();
                
             },
+          
             
           ),
           TextButton(
-            child: Text('YES'),
+            child: Text('YES',style: new TextStyle(color: Colors.green)),
             onPressed: () {
               Navigator.of(context).pop();
               setState(() => _aircrafts.remove(aircraft));

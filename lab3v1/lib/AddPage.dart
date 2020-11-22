@@ -21,19 +21,18 @@ class _AddPageState extends State<AddPage> {
   Widget build(BuildContext context) {
     // return Scaffold(
     //   appBar: AppBar(
-    //     title: Text('\n\n\nAdd an aircraft'),
-        
-    //     toolbarHeight: 100,
+    //     title: Text('Add an aircraft'),
     //   ),
     //   body: AddWidget(widget._aircrafts),
     // );
 
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
-              expandedHeight: 200.0,
+              expandedHeight: 150.0,
               floating: false,
               pinned: true,
               flexibleSpace: FlexibleSpaceBar(

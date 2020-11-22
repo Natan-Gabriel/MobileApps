@@ -30,7 +30,7 @@ class _AddWidgetState extends State<AddWidget> {
   @override
   Widget build(BuildContext context) {
     return new Padding(
-            padding: new EdgeInsets.all(30.0),
+            padding: const EdgeInsets.all(30.0),
             child:Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               
