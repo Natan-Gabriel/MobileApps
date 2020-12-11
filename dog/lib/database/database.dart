@@ -13,44 +13,43 @@ import 'package:dog/Dog.dart';
 
 
 class Db{
-  Db(){initDb();}
 
-  String _databaseName='doggie_database.db';
+  static const _databaseName = 'doggie_database.db';
+  static const _databaseVersion = 1;
 
-  static Future<Database> _db;
+  Db._();
+  static final Db instance = Db._();
 
-  Future<void> initDb() async{
-    // Directory dataDirectory=await getApplicationDocumentsDirectory();
-
-    // String dbPath = join(dataDirectory.path, _databaseName);
-    // print('db location : '+dbPath);
-    print('db location2 : '+await getDatabasesPath());
-    _db = openDatabase(
-      
-      // Set the path to the database. Note: Using the `join` function from the
-      // `path` package is best practice to ensure the path is correctly
-      // constructed for each platform.
-      join(await getDatabasesPath(), 'doggie_database.db'),
-      // When the database is first created, create a table to store dogs.
-      onCreate: (db, version) {
-        return db.execute(
-          "CREATE TABLE dogs(id INTEGER PRIMARY KEY, name TEXT, age INTEGER)",
-        );
-      },
-      // Set the version. This executes the onCreate function and provides a
-      // path to perform database upgrades and downgrades.
-      version: 1,
-    );
+  Database _database;
+  Future<Database> get database async {
+    if (_database != null) return _database;
+    _database = await _initDatabase();
+    return _database;
   }
+
+  _initDatabase() async {
+    String dbPath = join(await getDatabasesPath(), _databaseName);
+    print(dbPath);
+    return await openDatabase(dbPath,
+        version: _databaseVersion, onCreate: _onCreateDB);
+  }
+
+  Future _onCreateDB(Database db, int version) async {
+    //create tables
+    return await db.execute(
+          "CREATE TABLE dogs(id INTEGER PRIMARY KEY, name TEXT, age INTEGER)",
+        );  
+  }
+
   
 
   Future<void> insertDog(Dog dog) async {
-    Directory dataDirectory=await getApplicationDocumentsDirectory();
-    String dbPath = join(dataDirectory.path, _databaseName);
-    print('db location : '+dbPath);
+    // Directory dataDirectory=await getApplicationDocumentsDirectory();
+    // String dbPath = join(dataDirectory.path, _databaseName);
+    // print('db location : '+dbPath);
     
     // Get a reference to the database.
-    final Database db = await _db;
+    Database db = await database;
 
     // Insert the Dog into the correct table. You might also specify the
     // `conflictAlgorithm` to use in case the same dog is inserted twice.
@@ -67,7 +66,7 @@ class Db{
   // A method that retrieves all the dogs from the dogs table.
   Future<List<Dog>> dogs() async {
     // Get a reference to the database.
-    final Database db = await _db;
+    final Database db = await database;
 
     // Query the table for all The Dogs.
     final List<Map<String, dynamic>> maps = await db.query('dogs');
@@ -84,7 +83,7 @@ class Db{
   
   Future<void> updateDog(Dog dog) async {
     // Get a reference to the database.
-    final db = await _db;
+    Database db = await database;
 
     // Update the given Dog.
     await db.update(
@@ -99,7 +98,7 @@ class Db{
 
   Future<void> deleteDog(int id) async {
   // Get a reference to the database.
-    final db = await _db;
+    Database db = await database;
 
     // Remove the Dog from the Database.
     await db.delete(

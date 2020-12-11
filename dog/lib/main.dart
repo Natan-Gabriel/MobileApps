@@ -43,26 +43,37 @@ class MyApp extends StatelessWidget {
 }
 
 class ListDogs extends StatefulWidget {
-  Db db=new Db();
+  
   @override
-  _ListDogsState createState() => _ListDogsState(db);
+  _ListDogsState createState() => _ListDogsState();
 
 }
 
 class _ListDogsState extends State<ListDogs> {
 
   Db db;
-  _ListDogsState(Db _db){
-      db=_db;
-  }
 
   List<Dog> _dogs=[];
   final TextStyle _biggerFont= const TextStyle(fontSize: 18);
   final fido = Dog(
-    id: 3,
+    id: 4,
     name: 'Fido',
-    age: 35,
+    age: 45,
   );
+
+  @override
+  void initState() {
+    super.initState();
+    db = Db.instance;
+    _refreshList();
+  }
+
+  _refreshList() async {
+    List<Dog> x = await db.dogs();
+    setState(() {
+      _dogs = x;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +83,7 @@ class _ListDogsState extends State<ListDogs> {
       ),
       body: _buildDogs(),
       floatingActionButton: FloatingActionButton(
-        onPressed: insertDogFct,//_add,
+        onPressed: deleteDogFct,//_add,
         tooltip: 'Increment',
         child: const Icon(Icons.add), backgroundColor: Colors.green,
         ),
@@ -88,23 +99,14 @@ class _ListDogsState extends State<ListDogs> {
    Future<void> insertDogFct() async {
 
     db.insertDog(fido);
-
-    // Insert the Dog into the correct table. You might also specify the
-    // `conflictAlgorithm` to use in case the same dog is inserted twice.
-    //
-    // In this case, replace any previous data.
     developer.log('log me', name: 'my.app.category');
     developer.log(dogs().toString(), name: 'my.app.category');
+    _refreshList();
+}
+  Future<void> deleteDogFct() async {
 
-    dogs().then((result) {
-      print(result);
-      setState(() {
-        _dogs = result;
-      });
-    });
-
-
-    setState( () async => {print(await dogs()) } );
+    db.deleteDog(3);
+    _refreshList();
 }
 
   Widget _buildDogs() {
