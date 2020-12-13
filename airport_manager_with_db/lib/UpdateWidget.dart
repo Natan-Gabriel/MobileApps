@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'Aircraft.dart';
 
 
@@ -16,11 +17,12 @@ class _UpdateWidgetState extends State<UpdateWidget> {
 
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
 
-  final flightCodeController = TextEditingController();
-  final airlineController = TextEditingController();
-  final aircraftTypeController = TextEditingController();
-  final terminalController = TextEditingController();
-  final gateController = TextEditingController();
+  TextEditingController flightCodeController ;//= TextEditingController(text: widget._aircraft.flightCode);
+  TextEditingController airlineController;// = TextEditingController();
+  TextEditingController aircraftTypeController;// = TextEditingController();
+  TextEditingController terminalController;// = TextEditingController();
+  TextEditingController gateController;// = TextEditingController();
+  
 
 
   @override
@@ -32,7 +34,7 @@ class _UpdateWidgetState extends State<UpdateWidget> {
               
               children: <Widget>[  
 
-                  Text("Tail number: "+widget._aircraft.tailNumber,style:  _biggerFont) ,
+                  Text("Tail number: "+_aircraft.tailNumber,style:  _biggerFont) ,
 
                   // Padding(padding:new EdgeInsets.only(top: 10),child:Text("Tail number",style:  _biggerFont) ),
                   // // Text("Tail number",style:  _biggerFont) ,
@@ -46,23 +48,26 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                   // Text("Aircraft type",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
-                      controller: aircraftTypeController,          
+                      controller: aircraftTypeController=TextEditingController(text: _aircraft.aircraftType),          
                     ),
                   ),
 
+
+                  
                   Padding(padding:new EdgeInsets.only(top: 10),child:Text("Airline",style:  _biggerFont) ),
                   // Text("Airline",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
-                      controller: airlineController,          
+                      controller: airlineController=TextEditingController(text: _aircraft.airline),       
                     ),
                   ),
 
                   Padding(padding:new EdgeInsets.only(top: 10),child:Text("Flight code",style:  _biggerFont) ),
                   // Text("Flight code",style:  _biggerFont) ,
+                  
                   Flexible(
                     child:  TextField(
-                      controller: flightCodeController,          
+                      controller: flightCodeController=TextEditingController(text: _aircraft.flightCode),
                     ),
                   ),
 
@@ -70,7 +75,7 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                   // Text("Terminal",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
-                      controller: terminalController,          
+                      controller: terminalController=TextEditingController(text: _aircraft.terminal),          
                     ),
                   ),
 
@@ -78,13 +83,13 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                   // Text("Gate",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
-                      controller: gateController,          
+                      controller: gateController=TextEditingController(text: _aircraft.gate),          
                     ),
                   ),
 
                   FlatButton(
                       onPressed: () {
-                          Aircraft aircraft=Aircraft(widget._aircraft.tailNumber,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text);
+                          Aircraft aircraft=Aircraft(_aircraft.tailNumber,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text);
                           // widget._aircrafts.add(aircraft); 
                           // widget.notifyParent();
                           Navigator.pop(context,aircraft);
