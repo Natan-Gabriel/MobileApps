@@ -2,17 +2,11 @@ import 'package:flutter/material.dart';
 import 'Aircraft.dart';
 import 'UpdatePage.dart';
 
-class DetailWidget extends StatefulWidget {
+class DetailWidget extends StatelessWidget {
 
   final Aircraft _aircraft;
 
   DetailWidget(this._aircraft);
-
-  @override
-  _DetailWidgetState createState() => _DetailWidgetState();
-}
-
-class _DetailWidgetState extends State<DetailWidget> {
 
   final TextStyle _biggerFont = const TextStyle(fontSize: 30);
 
@@ -25,15 +19,15 @@ class _DetailWidgetState extends State<DetailWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
             
-            Text("Aircraft type: "+widget._aircraft.aircraftType,style:  _biggerFont) ,
+            Text("Aircraft type: "+_aircraft.aircraftType,style:  _biggerFont) ,
 
-            Text("Airline: "+widget._aircraft.airline,style:  _biggerFont) ,
+            Text("Airline: "+_aircraft.airline,style:  _biggerFont) ,
 
-            Text("Flight code: "+widget._aircraft.flightCode,style:  _biggerFont) ,
+            Text("Flight code: "+_aircraft.flightCode,style:  _biggerFont) ,
             
-            Text("Terminal: "+widget._aircraft.terminal,style:  _biggerFont) ,
+            Text("Terminal: "+_aircraft.terminal,style:  _biggerFont) ,
             
-            Text("Gate: "+widget._aircraft.gate,style:  _biggerFont) ,
+            Text("Gate: "+_aircraft.gate,style:  _biggerFont) ,
         
             FlatButton(
               onPressed: () {
@@ -42,7 +36,7 @@ class _DetailWidgetState extends State<DetailWidget> {
                 // widget._aircrafts.add(aircraft); 
                 // widget.notifyParent();
                 // Navigator.pop(context);
-                _update(widget._aircraft); 
+                _update(_aircraft,context); 
                 // Navigator.push(context, MaterialPageRoute(
                 //   builder: (context) =>
                 //      UpdatePage(widget._aircraft)
@@ -64,7 +58,7 @@ class _DetailWidgetState extends State<DetailWidget> {
             );
   }
 
-  void _update(Aircraft aircraft) async{
+  void _update(Aircraft aircraft,BuildContext context) async{
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the AddPage Screen.
     final Aircraft resultAircraft=await Navigator.push(context, MaterialPageRoute(

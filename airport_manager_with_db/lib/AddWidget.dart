@@ -2,13 +2,7 @@ import 'package:flutter/material.dart';
 import 'Aircraft.dart';
 
 
-class AddWidget extends StatefulWidget {
-
-  @override
-  _AddWidgetState createState() => _AddWidgetState();
-}
-
-class _AddWidgetState extends State<AddWidget> {
+class AddWidget extends StatelessWidget {
 
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
 

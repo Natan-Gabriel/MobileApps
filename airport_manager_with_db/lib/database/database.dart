@@ -18,8 +18,8 @@ import 'package:airport_manager/Aircraft.dart';
 //cd /data/user/0/com.example.airport_manager/databases
 //sqlite3 aircraft.db
 
-
-
+ 
+ 
 class Db{
 
   static const _databaseName = 'aircraft.db';

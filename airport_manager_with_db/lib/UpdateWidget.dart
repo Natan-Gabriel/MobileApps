@@ -36,14 +36,6 @@ class _UpdateWidgetState extends State<UpdateWidget> {
 
                   Text("Tail number: "+widget._aircraft.tailNumber,style:  _biggerFont) ,
 
-                  // Padding(padding:new EdgeInsets.only(top: 10),child:Text("Tail number",style:  _biggerFont) ),
-                  // // Text("Tail number",style:  _biggerFont) ,
-                  // Flexible(
-                  //   child:  TextField(
-                  //     controller: tailNumberController,          
-                  //   ),
-                  // ),
-                  
                   Padding(padding:new EdgeInsets.only(top: 10),child:Text("Aircraft type",style:  _biggerFont) ),
                   // Text("Aircraft type",style:  _biggerFont) ,
                   Flexible(
@@ -90,8 +82,7 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                   FlatButton(
                       onPressed: () {
                           Aircraft aircraft=Aircraft(widget._aircraft.tailNumber,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text);
-                          // widget._aircrafts.add(aircraft); 
-                          // widget.notifyParent();
+                          
                           Navigator.pop(context,aircraft);
                       },
                       child: Text(

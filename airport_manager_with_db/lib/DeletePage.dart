@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'Aircraft.dart';
 
-class DeletePage extends StatefulWidget {
+class DeletePage extends StatelessWidget {
 
 
   final List<Aircraft> _aircrafts;
@@ -10,11 +10,11 @@ class DeletePage extends StatefulWidget {
   DeletePage(this._aircrafts);
 
 
-  @override
-  _DeletePageState createState() => _DeletePageState();
-}
+//   @override
+//   _DeletePageState createState() => _DeletePageState();
+// }
 
-class _DeletePageState extends State<DeletePage> {
+// class _DeletePageState extends State<DeletePage> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(

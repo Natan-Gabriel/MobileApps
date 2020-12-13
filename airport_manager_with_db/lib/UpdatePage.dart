@@ -4,26 +4,14 @@ import 'Aircraft.dart';
 import 'UpdateWidget.dart';
 
 
-class UpdatePage extends StatefulWidget {
+class UpdatePage extends StatelessWidget {
 
   final Aircraft _aircraft;
 
   UpdatePage(this._aircraft);
 
   @override
-  _UpdatePageState createState() => _UpdatePageState();
-}
-
-class _UpdatePageState extends State<UpdatePage> {
-  @override
   Widget build(BuildContext context) {
-    // return Scaffold(
-    //   appBar: AppBar(
-    //     title: Text('Update an aircraft'),
-    //   ),
-    //   body: UpdateWidget(widget._aircraft),
-    // );
-
 
     return Scaffold(
       resizeToAvoidBottomPadding: false,
@@ -47,7 +35,7 @@ class _UpdatePageState extends State<UpdatePage> {
             ),
           ];
         }, //headerSliverBuilder
-        body: UpdateWidget(widget._aircraft)
+        body: UpdateWidget(_aircraft)
       )
     );
   }
