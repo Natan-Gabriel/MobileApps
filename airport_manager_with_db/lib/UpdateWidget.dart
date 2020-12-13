@@ -34,7 +34,7 @@ class _UpdateWidgetState extends State<UpdateWidget> {
               
               children: <Widget>[  
 
-                  Text("Tail number: "+_aircraft.tailNumber,style:  _biggerFont) ,
+                  Text("Tail number: "+widget._aircraft.tailNumber,style:  _biggerFont) ,
 
                   // Padding(padding:new EdgeInsets.only(top: 10),child:Text("Tail number",style:  _biggerFont) ),
                   // // Text("Tail number",style:  _biggerFont) ,
@@ -48,7 +48,7 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                   // Text("Aircraft type",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
-                      controller: aircraftTypeController=TextEditingController(text: _aircraft.aircraftType),          
+                      controller: aircraftTypeController=TextEditingController(text: widget._aircraft.aircraftType),          
                     ),
                   ),
 
@@ -58,7 +58,7 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                   // Text("Airline",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
-                      controller: airlineController=TextEditingController(text: _aircraft.airline),       
+                      controller: airlineController=TextEditingController(text: widget._aircraft.airline),       
                     ),
                   ),
 
@@ -67,7 +67,7 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                   
                   Flexible(
                     child:  TextField(
-                      controller: flightCodeController=TextEditingController(text: _aircraft.flightCode),
+                      controller: flightCodeController=TextEditingController(text: widget._aircraft.flightCode),
                     ),
                   ),
 
@@ -75,7 +75,7 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                   // Text("Terminal",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
-                      controller: terminalController=TextEditingController(text: _aircraft.terminal),          
+                      controller: terminalController=TextEditingController(text: widget._aircraft.terminal),          
                     ),
                   ),
 
@@ -83,13 +83,13 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                   // Text("Gate",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
-                      controller: gateController=TextEditingController(text: _aircraft.gate),          
+                      controller: gateController=TextEditingController(text: widget._aircraft.gate),          
                     ),
                   ),
 
                   FlatButton(
                       onPressed: () {
-                          Aircraft aircraft=Aircraft(_aircraft.tailNumber,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text);
+                          Aircraft aircraft=Aircraft(widget._aircraft.tailNumber,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text);
                           // widget._aircrafts.add(aircraft); 
                           // widget.notifyParent();
                           Navigator.pop(context,aircraft);
