@@ -1,3 +1,4 @@
+import 'server/server.dart';
 import 'package:airport_manager/size_config/size_config.dart';
 import 'package:flutter/material.dart';
 import 'Aircraft.dart';
@@ -5,6 +6,9 @@ import 'AddPage.dart';
 import 'DetailPage.dart';
 import 'database/database.dart';
 import 'dart:developer' as developer;
+import 'package:connectivity/connectivity.dart';
+import
+'package:data_connection_checker/data_connection_checker.dart';
 
 class ListAircraft extends StatefulWidget {
   @override
@@ -14,22 +18,54 @@ class ListAircraft extends StatefulWidget {
 class _ListAircraftState extends State<ListAircraft> {
 
   Db db; 
+  Server server;//=new Server();
 
   List<Aircraft> _aircrafts = [];  
+
+  List<Aircraft> _toAdd = [];  
+
+  var connectivityResult;
+
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
 
   @override
   void initState() {
     super.initState();
     db = Db.instance;
-    _refreshList();
+    server =new Server(); 
+
+    // getStatus();
+    
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
+    // Got a new connectivity status!
+      print("Connectivity: " + result.toString());
+      connectivityResult=result;
+      if(result==ConnectivityResult.mobile || result==ConnectivityResult.wifi){  
+        for (Aircraft aircraft in _toAdd){
+            Server.add(aircraft);
+        }
+      }
+    });
+    
+
+    _refreshList(context);
   }
 
-  _refreshList() async {
+  // getStatus() async{
+  //   connectivityResult = await (Connectivity().checkConnectivity());
+  //   print("Connectivity: " + connectivityResult.toString());
+  // }
+
+  _refreshList(BuildContext context) async {
     List<Aircraft> x = await db.getAll();
     setState(() {
       _aircrafts = x;
     });
+    if(connectivityResult == ConnectivityResult.none){
+      
+      final snackBar = SnackBar(content: Text('The server connection is down'));
+      Scaffold.of(context).showSnackBar(snackBar);
+    }
   }
 
 
@@ -60,11 +96,25 @@ class _ListAircraftState extends State<ListAircraft> {
                      AddPage()
                   
                 ));
+    
     if(aircraft!=null){
+      int result = await Server.add(aircraft);
       db.add(aircraft);
-      _refreshList(); 
-      final snackBar = SnackBar(content: Text('The item was successfully created !'));
-      Scaffold.of(context).showSnackBar(snackBar);
+      _refreshList(context); 
+      print("result"+result.toString());
+      if(result==200){
+        // db.add(aircraft);
+        // _refreshList(context); 
+        final snackBar = SnackBar(content: Text('The item was successfully created !'));
+        Scaffold.of(context).showSnackBar(snackBar);
+      }
+      else{
+        setState(() => _toAdd.add(aircraft)); 
+        final snackBar = SnackBar(content: Text('The item was successfully created !(locally)'));
+        Scaffold.of(context).showSnackBar(snackBar);
+      }
+      
+      
     }
     
   }
@@ -79,11 +129,20 @@ class _ListAircraftState extends State<ListAircraft> {
                 ));
     if(resultAircraft!=null){
       // setState(() => _aircrafts[_aircrafts.indexOf(aircraft)] = resultAircraft); 
-      db.update(resultAircraft);
-      _refreshList(); 
-      final snackBar = SnackBar(content: Text('The item was successfully updated !'));
-      Scaffold.of(context).showSnackBar(snackBar);
+      int result= await Server.update(resultAircraft);
+      if(result==200){
+        db.update(resultAircraft);
+        _refreshList(context); 
+        final snackBar = SnackBar(content: Text('The item was successfully updated !'));
+        Scaffold.of(context).showSnackBar(snackBar);
+      }
+      else{
+        final snackBar = SnackBar(content: Text('This operation is not available offline!'));
+        Scaffold.of(context).showSnackBar(snackBar);
+      }
+
     }
+    
      
   }
 
@@ -114,13 +173,20 @@ class _ListAircraftState extends State<ListAircraft> {
             ),
             TextButton(
               child: Text('YES',style: new TextStyle(color: Colors.green)),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
                 // setState(() => _aircrafts.remove(aircraft));
-                db.delete(aircraft.tailNumber);
-                _refreshList(); 
-                final snackBar = SnackBar(content: Text('The item was successfully deleted !'));
-                Scaffold.of(_context).showSnackBar(snackBar);
+                int result = await Server.delete(aircraft.tailNumber);
+                if(result==200){
+                  db.delete(aircraft.tailNumber);
+                  _refreshList(_context); 
+                  final snackBar = SnackBar(content: Text('The item was successfully deleted !'));
+                  Scaffold.of(_context).showSnackBar(snackBar);
+                }
+                else{
+                  final snackBar = SnackBar(content: Text('This operation is not available offline!'));
+                  Scaffold.of(_context).showSnackBar(snackBar);
+                }
               },
             ),
           ],

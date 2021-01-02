@@ -12,11 +12,37 @@ import 'dart:convert';
 
 class Server{
 
-  final String url='10.0.2.2:8000';
+  static const String url='10.0.2.2:8000';
 
+
+  // Server._();
+  // static final Server instance = Server._();
+
+  // Server._();
+  // static final Server instance = Server._();
+
+  // Server _server;
+
+  
+  static Server _instance;
+  factory Server() => _instance ??= new Server._();
 
   Server._();
-  static final Server instance = Server._();
+
+
+  // Server._();
+
+  // static final Server _instance = Server._();
+
+  // static Server get instance => _instance;
+
+  // static Server _instance;
+
+  // Server._internal() {
+  //   _instance = this;
+  // }
+
+  // factory Server() => _instance ?? Server._internal();
 
   // Database _database;
   // Future<Database> get database async {
@@ -25,9 +51,9 @@ class Server{
   //   return _database;
   // }
 
-  Future<http.Response> isOnline() {
-    return http.get('https://jsonplaceholder.typicode.com/albums/1');
-  }
+  // Future<http.Response> isOnline() {
+  //   return http.get('https://jsonplaceholder.typicode.com/albums/1');
+  // }
 
   // _initDatabase() async {
   //   String dbPath = join(await getDatabasesPath(), _databaseName);
@@ -44,34 +70,71 @@ class Server{
   // }
 
   
-
-  Future<void> add(Aircraft aircraft) async {
-    print("aircraft: "+aircraft.toString());
-    return http.post(
+  static Future<int> add(Aircraft aircraft) async {
+    // print("aircraft: "+aircraft.toString());
+    try{
+    final http.Response response = await http.post(
       new Uri.http(url, "/aircraft"),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body:  jsonEncode(aircraft.toMap())
+      // headers: <String, String>{
+      //   'Content-Type': 'application/json; charset=UTF-8',
+      // },
+      body:  aircraft.toMap()
     );
+    return response.statusCode;
+    }
+    catch(Exception){
+        return -1;
+    }
+  }
+
+  static Future<int> update(Aircraft aircraft) async {
+    // print("aircraft: "+aircraft.toString());
+    final http.Response response = await http.put(
+      new Uri.http(url, "/aircraft"+"/"+ aircraft.tailNumber),
+      // headers: <String, String>{
+      //   'Content-Type': 'application/json; charset=UTF-8',
+      // },
+      body:  aircraft.toMap()
+    );
+    if (response.statusCode == 200) {
+      return 200;
+  } else {
+      // If the server did not return a 200 response,
+      // then throw an exception.
+      throw Exception('Failed to update the aircraft');
+  }
+  }
+
+  static Future<int> delete(String id) async {
+    // print("aircraft: "+aircraft.toString());
+    try{
+    final http.Response response = await http.delete(
+      new Uri.http(url, "/aircraft"+"/"+ id)
+    );
+    return response.statusCode;
+    }
+    catch(Exception){
+        return -1;
+    }
+      
   }
 
 
   // A method that retrieves all the dogs from the dogs table.
-  Future<Aircraft> getAll() async {
+  // Future<Aircraft> getAll() async {
 
-    final response = await http.get(url+'/aircraft/'+"1");
+  //   final response = await http.get(url+'/aircraft/'+"1");
 
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    return Aircraft.fromJson(jsonDecode(response.body));
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load album');
-  }
-  }
+  // if (response.statusCode == 200) {
+  //   // If the server did return a 200 OK response,
+  //   // then parse the JSON.
+  //   return jsonDecode(response.body);
+  // } else {
+  //   // If the server did not return a 200 OK response,
+  //   // then throw an exception.
+  //   throw Exception('Failed to load album');
+  // }
+  // }
   
   // Future<void> update(Aircraft aircraft) async {
   //   // Get a reference to the database.
