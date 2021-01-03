@@ -45,7 +45,19 @@ class _ListAircraftState extends State<ListAircraft> {
         for (Aircraft aircraft in _toAdd){
             Server.add(aircraft);
         }
-        List<Aircraft> aircrafts_on_db = await db.getAll();
+         await sync();
+
+        _refreshList(context); 
+
+      }
+    });
+    
+
+    _refreshList(context);
+  }
+
+  void sync() async{
+    List<Aircraft> aircrafts_on_db = await db.getAll();
         List<Aircraft> aircrafts_on_server = await Server.getAll();
         print("aircrafts_on_server: "+aircrafts_on_server.toString());
         for (Aircraft aircraft in aircrafts_on_db){
@@ -63,14 +75,7 @@ class _ListAircraftState extends State<ListAircraft> {
         for (Aircraft aircraft in _toAdd){
           db.add(aircraft);
         }
-
-        _refreshList(context); 
-
-      }
-    });
-    
-
-    _refreshList(context);
+        _refreshList(context);
   }
 
   // getStatus() async{
@@ -97,7 +102,12 @@ class _ListAircraftState extends State<ListAircraft> {
     return Scaffold (                    
       appBar: AppBar(
         title: Text('Airport Manager'),
-        
+        leading: FlatButton(
+    onPressed: () { sync(); },
+    child: Icon(
+      Icons.sync,  // add custom icons also
+    ),
+  ),
       ),
       body: _buildAircrafts1(),//createTable(),//_buildAircrafts(),//createTable(),  <-if you want the version from previous lab
       floatingActionButton: Builder(builder: (context) => FloatingActionButton(

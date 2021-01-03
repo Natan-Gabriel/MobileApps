@@ -21,6 +21,17 @@ class Aircraft {
     };
   }
 
+@override
+  bool operator ==(Object other) {
+    Aircraft o=other;
+    if (this.tailNumber == o.tailNumber && this.aircraftType == o.aircraftType && this.airline == o.airline && this.flightCode == o.flightCode && this.terminal == o.terminal && this.gate == o.gate){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+
   // static Aircraft fromMap(Map<String, dynamic> map) {
   //   return Aircraft(map[tailNumber],map[aircraftType],map[airline],map[flightCode],map[terminal],map[gate]);
   // }
