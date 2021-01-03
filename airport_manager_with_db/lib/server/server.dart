@@ -89,6 +89,7 @@ class Server{
 
   static Future<int> update(Aircraft aircraft) async {
     // print("aircraft: "+aircraft.toString());
+    try{
     final http.Response response = await http.put(
       new Uri.http(url, "/aircraft"+"/"+ aircraft.tailNumber),
       // headers: <String, String>{
@@ -96,12 +97,12 @@ class Server{
       // },
       body:  aircraft.toMap()
     );
-    if (response.statusCode == 200) {
-      return 200;
-  } else {
+    return response.statusCode;
+    } 
+    catch(Exception) {
       // If the server did not return a 200 response,
       // then throw an exception.
-      throw Exception('Failed to update the aircraft');
+      return -1;
   }
   }
 
@@ -121,20 +122,24 @@ class Server{
 
 
   // A method that retrieves all the dogs from the dogs table.
-  // Future<Aircraft> getAll() async {
+  static Future<List<Aircraft>> getAll() async {
 
-  //   final response = await http.get(url+'/aircraft/'+"1");
+    final response = await http.get(new Uri.http(url, '/aircrafts'));
+    List<Aircraft> aircrafts = List<Aircraft>();
 
-  // if (response.statusCode == 200) {
-  //   // If the server did return a 200 OK response,
-  //   // then parse the JSON.
-  //   return jsonDecode(response.body);
-  // } else {
-  //   // If the server did not return a 200 OK response,
-  //   // then throw an exception.
-  //   throw Exception('Failed to load album');
-  // }
-  // }
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    for(Map<String, dynamic> aircraft in jsonDecode(response.body)){
+      aircrafts.add(Aircraft(aircraft['tailNumber'], aircraft['aircraftType'], aircraft['airline'], aircraft['flightCode'], aircraft['terminal'], aircraft['gate']));
+    }
+    return aircrafts;
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load album');
+  }
+  }
   
   // Future<void> update(Aircraft aircraft) async {
   //   // Get a reference to the database.

@@ -41,9 +41,31 @@ class _ListAircraftState extends State<ListAircraft> {
       print("Connectivity: " + result.toString());
       connectivityResult=result;
       if(result==ConnectivityResult.mobile || result==ConnectivityResult.wifi){  
+        print("aici");
         for (Aircraft aircraft in _toAdd){
             Server.add(aircraft);
         }
+        List<Aircraft> aircrafts_on_db = await db.getAll();
+        List<Aircraft> aircrafts_on_server = await Server.getAll();
+        print("aircrafts_on_server: "+aircrafts_on_server.toString());
+        for (Aircraft aircraft in aircrafts_on_db){
+          if (!aircrafts_on_server.contains(aircraft)){
+              db.delete(aircraft.tailNumber);
+          }
+        }
+
+        for (Aircraft aircraft in aircrafts_on_server){
+          if (!aircrafts_on_db.contains(aircraft)){
+              db.add(aircraft);
+          }
+        }
+
+        for (Aircraft aircraft in _toAdd){
+          db.add(aircraft);
+        }
+
+        _refreshList(context); 
+
       }
     });
     

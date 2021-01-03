@@ -21,6 +21,10 @@ class Aircraft {
     };
   }
 
+  // static Aircraft fromMap(Map<String, dynamic> map) {
+  //   return Aircraft(map[tailNumber],map[aircraftType],map[airline],map[flightCode],map[terminal],map[gate]);
+  // }
+
   @override
   String toString() {
     return 'Aircraft{tailNumber: $tailNumber, aircraftType: $aircraftType, airline: $airline,flightCode: $flightCode, terminal: $terminal, gate: $gate}';
