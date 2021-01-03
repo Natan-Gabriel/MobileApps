@@ -46,6 +46,9 @@ class _ListAircraftState extends State<ListAircraft> {
             Server.add(aircraft);
         }
          await sync();
+         setState(() {
+          _toAdd = [];
+        });
 
         _refreshList(context); 
 
@@ -72,9 +75,7 @@ class _ListAircraftState extends State<ListAircraft> {
           }
         }
 
-        for (Aircraft aircraft in _toAdd){
-          db.add(aircraft);
-        }
+        
         _refreshList(context);
   }
 
