@@ -1,0 +1,18 @@
+import 'package:airport_manager/size_config/size_config.dart';
+import 'package:flutter/material.dart';
+import 'ListAircraft.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Planes App',
+      theme: ThemeData(         
+        primaryColor: Colors.green,
+      ),                       
+      home: ListAircraft(),
+    );
+  }
+}
