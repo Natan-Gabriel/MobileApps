@@ -102,7 +102,8 @@ class Server{
     // then parse the JSON.
     for(Map<String, dynamic> aircraft in jsonDecode(response.body)){
       print(aircraft['id']);
-      aircrafts.add(Plane.fromMap(aircraft));
+      //aircrafts.add(Plane.fromMap(aircraft));
+      aircrafts.add(Plane(aircraft['id'], aircraft['name'], aircraft['status'], aircraft['size'], aircraft['owner'], aircraft['manufacturer'], aircraft['capacity']));
     }
     return aircrafts;
   } else {

@@ -152,7 +152,7 @@ class _ListAircraftState extends State<ListAircraft> {
     
   }
 
-  void _detail(Aircraft aircraft,BuildContext context) async{
+  void _detail(Plane aircraft,BuildContext context) async{
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the AddPage Screen.
     final Aircraft resultAircraft=await Navigator.push(context, MaterialPageRoute(
@@ -274,9 +274,9 @@ class _ListAircraftState extends State<ListAircraft> {
     //           color: Colors.red,
     //         ),
 
-    //   onTap: () {      
-    //     _detail(aircraft, context);
-    // },
+      onTap: () {      
+        _detail(aircraft, context);
+    },
 
     );
   }

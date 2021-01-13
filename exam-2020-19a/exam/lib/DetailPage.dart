@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'Aircraft.dart';
 import 'DetailWidget.dart';
+import 'domain/Plane.dart';
 
 class DetailPage extends StatelessWidget {
 
-  final Aircraft _aircraft;
+  final Plane _aircraft;
 
   DetailPage(this._aircraft);
 
@@ -23,7 +24,7 @@ class DetailPage extends StatelessWidget {
               pinned: true,
               flexibleSpace: FlexibleSpaceBar(
                   
-                  title: Text(_aircraft.tailNumber,
+                  title: Text(_aircraft.id.toString(),
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16.0,

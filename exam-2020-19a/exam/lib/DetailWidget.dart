@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'Aircraft.dart';
 import 'UpdatePage.dart';
+import 'domain/Plane.dart';
 
 class DetailWidget extends StatelessWidget {
 
-  final Aircraft _aircraft;
+  final Plane _aircraft;
 
   DetailWidget(this._aircraft);
 
@@ -18,32 +19,24 @@ class DetailWidget extends StatelessWidget {
             child:Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-            
-            Text("Aircraft type: "+_aircraft.aircraftType,style:  _biggerFont) ,
+   
+            Text("Name: "+_aircraft.name,style:  _biggerFont) ,
 
-            Text("Airline: "+_aircraft.airline,style:  _biggerFont) ,
+            Text("Status: "+_aircraft.status,style:  _biggerFont) ,
+            
+            Text("Size: "+_aircraft.size.toString(),style:  _biggerFont) ,
+            
+            Text("Owner: "+_aircraft.owner,style:  _biggerFont) ,
 
-            Text("Flight code: "+_aircraft.flightCode,style:  _biggerFont) ,
-            
-            Text("Terminal: "+_aircraft.terminal,style:  _biggerFont) ,
-            
-            Text("Gate: "+_aircraft.gate,style:  _biggerFont) ,
+            Text("Manufacturer: "+_aircraft.manufacturer,style:  _biggerFont) ,
+
+            Text("Capacity: "+_aircraft.capacity.toString(),style:  _biggerFont) ,
         
             FlatButton(
               onPressed: () {
-                // setState(() => widget._aircrafts.add(Aircraft(tailNumberController.text,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text))); 
-                //Aircraft aircraft=Aircraft(tailNumberController.text,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text);
-                // widget._aircrafts.add(aircraft); 
-                // widget.notifyParent();
-                // Navigator.pop(context);
-                _update(_aircraft,context); 
-                // Navigator.push(context, MaterialPageRoute(
-                //   builder: (context) =>
-                //      UpdatePage(widget._aircraft)
-                  
-                // ));
-              
-                // Navigator.pop(context);//
+
+                //_update(_aircraft,context); 
+
               },
               child: Text(
                 "Update",
