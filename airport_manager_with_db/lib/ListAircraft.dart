@@ -7,8 +7,7 @@ import 'DetailPage.dart';
 import 'database/database.dart';
 import 'dart:developer' as developer;
 import 'package:connectivity/connectivity.dart';
-import
-'package:data_connection_checker/data_connection_checker.dart';
+import 'package:data_connection_checker/data_connection_checker.dart';
 
 class ListAircraft extends StatefulWidget {
   @override
@@ -90,9 +89,7 @@ class _ListAircraftState extends State<ListAircraft> {
       _aircrafts = x;
     });
     if(connectivityResult == ConnectivityResult.none){
-      
-      final snackBar = SnackBar(content: Text('The server connection is down'));
-      Scaffold.of(context).showSnackBar(snackBar);
+      showSnackBar(context,'The server connection is down');
     }
   }
 
@@ -131,20 +128,22 @@ class _ListAircraftState extends State<ListAircraft> {
                 ));
     
     if(aircraft!=null){
-      int result = await Server.add(aircraft);
+      int result = 0;
       db.add(aircraft);
-      _refreshList(context); 
-      print("result"+result.toString());
+        _refreshList(context); 
+      if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+        result= await Server.add(aircraft);
+        
+        print("result"+result.toString());
+      }
       if(result==200){
         // db.add(aircraft);
         // _refreshList(context); 
-        final snackBar = SnackBar(content: Text('The item was successfully created !'));
-        Scaffold.of(context).showSnackBar(snackBar);
+        showSnackBar(context,'The item was successfully created !');
       }
       else{
         setState(() => _toAdd.add(aircraft)); 
-        final snackBar = SnackBar(content: Text('The item was successfully created !(locally)'));
-        Scaffold.of(context).showSnackBar(snackBar);
+        showSnackBar(context,'The item was successfully created !(locally)');
       }
       
       
@@ -162,16 +161,17 @@ class _ListAircraftState extends State<ListAircraft> {
                 ));
     if(resultAircraft!=null){
       // setState(() => _aircrafts[_aircrafts.indexOf(aircraft)] = resultAircraft); 
-      int result= await Server.update(resultAircraft);
+      int result=0;
+      if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+        result= await Server.update(resultAircraft);
+      }
       if(result==200){
         db.update(resultAircraft);
         _refreshList(context); 
-        final snackBar = SnackBar(content: Text('The item was successfully updated !'));
-        Scaffold.of(context).showSnackBar(snackBar);
+        showSnackBar(context,'The item was successfully updated !');
       }
       else{
-        final snackBar = SnackBar(content: Text('This operation is not available offline!'));
-        Scaffold.of(context).showSnackBar(snackBar);
+        showSnackBar(context,'This operation is not available offline!');
       }
 
     }
@@ -209,16 +209,17 @@ class _ListAircraftState extends State<ListAircraft> {
               onPressed: () async {
                 Navigator.of(context).pop();
                 // setState(() => _aircrafts.remove(aircraft));
-                int result = await Server.delete(aircraft.tailNumber);
+                int result=0;
+                if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+                  result = await Server.delete(aircraft.tailNumber);
+                }
                 if(result==200){
                   db.delete(aircraft.tailNumber);
-                  _refreshList(_context); 
-                  final snackBar = SnackBar(content: Text('The item was successfully deleted !'));
-                  Scaffold.of(_context).showSnackBar(snackBar);
+                  _refreshList(_context);
+                  showSnackBar(_context, 'The item was successfully deleted !'); 
                 }
                 else{
-                  final snackBar = SnackBar(content: Text('This operation is not available offline!'));
-                  Scaffold.of(_context).showSnackBar(snackBar);
+                  showSnackBar(_context, 'This operation is not available offline!');
                 }
               },
             ),
@@ -279,118 +280,10 @@ class _ListAircraftState extends State<ListAircraft> {
     );
   }
 
-  //   Widget createTable() {
-  //     List<DataColumn> _columns = [];
-  //     List<DataRow> _rows = [];
-  //     _columns.add(DataColumn(label:Text("Flight\ncode",textScaleFactor: 1.5)));
-  //     _columns.add(DataColumn(label:Text("Terminal",textScaleFactor: 1.5)));
-  //     _columns.add(DataColumn(label:Text("Gate",textScaleFactor: 1.5)));
-  //     _columns.add(DataColumn(label:Text("",textScaleFactor: 1.5)));
-
-  //     for (int i = 0; i < _aircrafts.length;++i) {
-  //       _rows.add(_createRow(_aircrafts[i]));
-  //     }
-
-  //     return SingleChildScrollView(
-  //       padding: const EdgeInsets.only(top:20.0,bottom:80.0),
-        
-  //       child:DataTable(
-  //             columnSpacing: 10.0,
-  //             showCheckboxColumn: false,
-  //             columns: _columns,
-  //             rows: _rows
-  //           ));
-
-  //   }
-
-  //   Widget customContainer(String str){
-  //   return Container(
-  //     width: SizeConfig.blockSizeHorizontal * 20,
-  //     child: Text(str,textScaleFactor: 1.5),
-  //   );
-  // }
-
-  // DataRow _createRow(Aircraft aircraft) {
-
-  //   return  DataRow(cells:<DataCell> [
-  //         DataCell(customContainer(aircraft.flightCode)),
-  //         DataCell(customContainer(aircraft.terminal)),
-  //         DataCell(customContainer(aircraft.gate)),
-  //         DataCell(Container(
-  //             width: SizeConfig.blockSizeHorizontal * 19,
-  //             child:FlatButton(
-              
-  //             onPressed: () { _showMyDialog(aircraft); },
-  //             child: Text(
-  //               "Delete",
-  //             ),
-  //             color: Colors.red,
-  //           ))),
-  //       ],
-  //       onSelectChanged: (bool selected) {
-  //               if (selected) {
-  //                   _detail(aircraft);
-  //               }
-  //           }
-  //       );
-  // }
-
-
-
-
-
-
-
-
-  // Widget _buildAircrafts() {
-  //   return ListView.builder(
-  //     padding: const EdgeInsets.all(16),
-  //      itemCount: _aircrafts.length*2,
-  //     // The itemBuilder callback is called once per suggested 
-  //     // word pairing, and places each suggestion into a ListTile
-  //     // row. For even rows, the function adds a ListTile row for
-  //     // the word pairing. For odd rows, the function adds a 
-  //     // Divider widget to visually separate the entries. Note that
-  //     // the divider may be difficult to see on smaller devices.
-  //     itemBuilder: (BuildContext _context, int i) {
-  //       // Add a one-pixel-high divider widget before each row 
-  //       // in the ListView.
-  //       if (i.isOdd) {
-  //         return Divider();
-  //       }
-  //       // The syntax "i ~/ 2" divides i by 2 and returns an 
-  //       // integer result.
-  //       final int index = i ~/ 2;
-  //       return _buildRow(_aircrafts[index]);
-  //     }
-  //   );
-  // }
-
-  // Widget _buildRow(Aircraft aircraft) {
-
-  //   return ListTile(
-  //     title: Text(
-  //       aircraft.flightCode+"    "+
-  //       aircraft.terminal+"    "+
-  //       aircraft.gate,
-  //       style: _biggerFont,
-  //     ),
-
-  //     trailing: FlatButton(
-  //             onPressed: () { _showMyDialog(aircraft); },
-  //             child: Text(
-  //               "Delete",
-  //             ),
-  //             color: Colors.red,
-  //           ),
-
-  //     onTap: () {      
-  //       _detail(aircraft);
-  //   },
-
-  //   );
-  // }
-
+  void showSnackBar(BuildContext _context,String message){
+    final snackBar = SnackBar(content: Text(message));
+    Scaffold.of(_context).showSnackBar(snackBar);
+  }
 
 
 }
