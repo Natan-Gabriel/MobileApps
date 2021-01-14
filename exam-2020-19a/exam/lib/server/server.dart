@@ -112,6 +112,28 @@ class Server{
     throw Exception('Failed to load album');
   }
   }
+
+
+  static Future<List<String>> getManufacturers() async {
+
+    final response = await http.get(new Uri.http(url, '/types'));
+    List<String> aircrafts = List<String>();
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    for(String aircraft in jsonDecode(response.body)){
+      //print(aircraft['id']);
+      //aircrafts.add(Plane.fromMap(aircraft));
+      aircrafts.add(aircraft);
+    }
+    return aircrafts;
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load album');
+  }
+  }
   
   // Future<void> update(Aircraft aircraft) async {
   //   // Get a reference to the database.

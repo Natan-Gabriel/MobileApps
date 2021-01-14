@@ -37,7 +37,7 @@ class Plane {
   bool operator ==(Object other) {
     Plane o=other;
     //if (this.tailNumber == o.tailNumber && this.aircraftType == o.aircraftType && this.airline == o.airline && this.flightCode == o.flightCode && this.terminal == o.terminal && this.gate == o.gate){
-    if (this.id == o.id){
+    if (this.id == o.id && this.name == o.name && this.status == o.status && this.size == o.size && this.owner == o.owner && this.manufacturer == o.manufacturer && this.capacity == o.capacity){
       return true;
     }
     else{

@@ -108,15 +108,15 @@ class Db{
     );
   }
 
-  Future<void> delete(String id) async {
+  Future<void> delete(int id) async {
   // Get a reference to the database.
     Database db = await database;
 
     // Remove the Dog from the Database.
     await db.delete(
-      'aircrafts',
+      'planes',
       // Use a `where` clause to delete a specific dog.
-      where: "tailNumber = ?",
+      where: "id = ?",
       // Pass the Dog's id as a whereArg to prevent SQL injection.
       whereArgs: [id],
     );

@@ -1,3 +1,5 @@
+import 'package:airport_manager/ManageSection.dart';
+
 import 'domain/Plane.dart';
 import 'server/server.dart';
 import 'package:airport_manager/size_config/size_config.dart';
@@ -34,7 +36,9 @@ class _ListAircraftState extends State<ListAircraft> {
     db = Db.instance;
     server =new Server(); 
 
-    // getStatus();
+    _refreshList(context);
+
+
     
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
     // Got a new connectivity status!
@@ -45,27 +49,21 @@ class _ListAircraftState extends State<ListAircraft> {
         for (Plane plane in _toAdd){
             Server.add(plane);
         }
-         await sync();
-         setState(() {
-          _toAdd = [];
-        });
-
-        _refreshList(context); 
+         await sync(context);
 
       }
     });
-    
-
-    _refreshList(context);
+  
   }
 
-  void sync() async{
-    List<Plane> aircrafts_on_db = await db.getAll();
+  void sync(BuildContext context) async{
+    if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+        List<Plane> aircrafts_on_db = await db.getAll();
         List<Plane> aircrafts_on_server = await Server.getAll();
         print("aircrafts_on_server: "+aircrafts_on_server.toString());
         for (Plane aircraft in aircrafts_on_db){
           if (!aircrafts_on_server.contains(aircraft)){
-              ;//db.delete(aircraft.id);
+              db.delete(aircraft.id);
           }
         }
 
@@ -74,6 +72,10 @@ class _ListAircraftState extends State<ListAircraft> {
               db.add(aircraft);
           }
         }
+        setState(() {
+          _toAdd = [];
+        });
+    }
 
         
         _refreshList(context);
@@ -85,12 +87,14 @@ class _ListAircraftState extends State<ListAircraft> {
   // }
 
   _refreshList(BuildContext context) async {
+    print("_refreshList entered");
     List<Plane> x = await db.getAll();
     setState(() {
       _aircrafts = x;
     });
     if(connectivityResult == ConnectivityResult.none){
-      showSnackBar(context,'The server connection is down');
+      print("connectivityResult == ConnectivityResult.none");
+      showSnackBar(context,'The server connection is down.Retry using sync button');
     }
   }
 
@@ -100,21 +104,80 @@ class _ListAircraftState extends State<ListAircraft> {
 
     return Scaffold (                    
       appBar: AppBar(
-        title: Text('Planes App'),
-        leading: FlatButton(
-    onPressed: () { sync(); },
-    child: Icon(
-      Icons.sync,  // add custom icons also
-    ),
-  ),
+        title: Text('Registration'),
+  //       leading: Builder(builder: (context) => FlatButton(
+  //   onPressed: () { sync(context); },
+  //   child: Icon(
+  //     Icons.sync,  // add custom icons also
+  //   ),
+  // )),
+  actions: <Widget>[
+          Builder(builder: (context) =>IconButton(
+            icon: Icon(Icons.sync),
+            onPressed: () { sync(context); },
+          ),
+          )
+
+        ],
       ),
+
+      
       body: _buildAircrafts1(),//createTable(),//_buildAircrafts(),//createTable(),  <-if you want the version from previous lab
+      drawer: Drawer(
+        // Add a ListView to the drawer. This ensures the user can scroll
+        // through the options in the drawer if there isn't enough vertical
+        // space to fit everything.
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text('Drawer Header'),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              title: Text('Registration section'),
+              onTap: () {
+                // Update the state of the app
+                // ...
+                // Then close the drawer
+                
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('Manage section'),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) =>
+                     ManageSection()
+                  
+                ));
+
+                //Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('Reports section'),
+              onTap: () {
+                // Update the state of the app
+                // ...
+                // Then close the drawer
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
       floatingActionButton: Builder(builder: (context) => FloatingActionButton(
         onPressed : () => _add(context),
         tooltip: 'Increment',
         child: const Icon(Icons.add),backgroundColor: Colors.green,
       )
       )
+      
       );                                      
   }
 
@@ -215,7 +278,7 @@ class _ListAircraftState extends State<ListAircraft> {
                   result = await Server.delete(aircraft.tailNumber);
                 }
                 if(result==200){
-                  db.delete(aircraft.tailNumber);
+                  //db.delete(aircraft.id);
                   _refreshList(_context);
                   showSnackBar(_context, 'The item was successfully deleted !'); 
                 }
