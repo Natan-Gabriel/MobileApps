@@ -1,6 +1,10 @@
 
+
+
+
+
+
 import 'package:airport_manager/ListAircraft.dart';
-import 'package:airport_manager/Reports.dart';
 
 import 'PlanesByManufacturer.dart';
 import 'domain/Plane.dart';
@@ -15,17 +19,25 @@ import 'dart:developer' as developer;
 import 'package:connectivity/connectivity.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
 
-class ManageSection extends StatefulWidget {
+class PlanesByManufacturer extends StatefulWidget {
+  final String _aircraft;
+
+  PlanesByManufacturer(this._aircraft);
   @override
-  _ManageSectionState createState() => _ManageSectionState();
+  _PlanesByManufacturerState createState() => _PlanesByManufacturerState();
 }
 
-class _ManageSectionState extends State<ManageSection> {
+class _PlanesByManufacturerState extends State<PlanesByManufacturer> {
+
+
+  // final Plane _aircraft;
+
+  // _PlanesByManufacturerState(this._aircraft);
 
   Db db; 
   Server server;//=new Server();
 
-  List<String> _manufacturers = [];  
+  List<Plane> _manufacturers = [];  
 
   int selected=-1;
 
@@ -36,7 +48,7 @@ class _ManageSectionState extends State<ManageSection> {
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     db = Db.instance;
     server =new Server(); 
@@ -48,52 +60,16 @@ class _ManageSectionState extends State<ManageSection> {
     connectivityResult.then((data){
       connectivityResult=data;
     });
+    // connectivityResult.then((val){print("val: "+val.toString());});
+    
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
     // Got a new connectivity status!
       print("Connectivity: " + result.toString());
       connectivityResult=result;
-      //connectivityResult.then((val){print("val: "+val.toString());});
-      if(result==ConnectivityResult.mobile || result==ConnectivityResult.wifi){  
-        print("aici");
-        for (Plane plane in _toAdd){
-            Server.add(plane);
-        }
-         //await sync(context);
-
-      }
     });
   
   }
 
-  // void sync(BuildContext context) async{
-  //   if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-  //       List<Plane> aircrafts_on_db = await db.getAll();
-  //       List<Plane> aircrafts_on_server = await Server.getAll();
-  //       print("aircrafts_on_server: "+aircrafts_on_server.toString());
-  //       for (Plane aircraft in aircrafts_on_db){
-  //         if (!aircrafts_on_server.contains(aircraft)){
-  //             db.delete(aircraft.id);
-  //         }
-  //       }
-
-  //       for (Plane aircraft in aircrafts_on_server){
-  //         if (!aircrafts_on_db.contains(aircraft)){
-  //             db.add(aircraft);
-  //         }
-  //       }
-  //       setState(() {
-  //         _toAdd = [];
-  //       });
-  //   }
-
-        
-  //       _refreshList(context);
-  // }
-
-  // getStatus() async{
-  //   connectivityResult = await (Connectivity().checkConnectivity());
-  //   print("Connectivity: " + connectivityResult.toString());
-  // }
 
   _refreshList(BuildContext context) async {
     if(connectivityResult == ConnectivityResult.none){
@@ -102,7 +78,7 @@ class _ManageSectionState extends State<ManageSection> {
     }
     else{
       print("_refreshList entered");
-      List<String> x = await Server.getManufacturers();
+      List<Plane> x = await Server.getAvailable(widget._aircraft);
       setState(() {
         _manufacturers = x;
       });
@@ -116,7 +92,7 @@ class _ManageSectionState extends State<ManageSection> {
 
     return Scaffold (                    
       appBar: AppBar(
-        title: Text('Manage'),
+        title: Text('Planes by manufacturer'),
       ),
 
       //body:Builder(builder: (_context) =>_buildAircrafts1(_context)),// Builder(builder: (_context) =>_buildAircrafts1(_context)),//createTable(),//_buildAircrafts(),//createTable(),  <-if you want the version from previous lab
@@ -124,7 +100,7 @@ class _ManageSectionState extends State<ManageSection> {
         // Add a ListView to the drawer. This ensures the user can scroll
         // through the options in the drawer if there isn't enough vertical
         // space to fit everything.
-        child: Builder(builder: (_context) =>ListView(
+        child: ListView(
           // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
           children: <Widget>[
@@ -162,28 +138,69 @@ class _ManageSectionState extends State<ManageSection> {
                 // Update the state of the app
                 // ...
                 // Then close the drawer
-                if(connectivityResult!=ConnectivityResult.mobile && connectivityResult!=ConnectivityResult.wifi){
-                  Navigator.pop(context);
-                  showSnackBar(_context, "Please connect to the internet");
-                }
-                else{
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) =>
-                     Reports()
-                  
-                ));
-                }
+                Navigator.pop(context);
               },
             ),
           ],
         ),
-      )
       ),
       
       body:_buildAircrafts1(),// Builder(builder: (_context) =>_buildAircrafts1(_context)),//createTable(),//_buildAircrafts(),//createTable(),  <-if you want the version from previous lab
       
       );                                      
   }
+
+  Future<void> _showMyDialog(Plane aircraft,BuildContext _context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        
+        return AlertDialog(
+          title: Text('Alert!'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want to delete this item?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('NO',style: new TextStyle(color: Colors.green)),
+              
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            
+              
+            ),
+            TextButton(
+              child: Text('YES',style: new TextStyle(color: Colors.green)),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                // setState(() => _aircrafts.remove(aircraft));
+                int result=0;
+                if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+                  result = await Server.delete(aircraft.id);
+                }
+                print("result: "+result.toString());
+                if(result==200){
+                  //db.delete(aircraft.id);
+                  _refreshList(_context);
+                  showSnackBar(_context, 'The item was successfully deleted !'); 
+                }
+                
+                else{
+                  showSnackBar(_context, 'This operation is not available offline!');
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+}  
 
   
 
@@ -232,11 +249,11 @@ class _ManageSectionState extends State<ManageSection> {
 
   }
 
-  Widget _buildRow1(String aircraft,BuildContext context) {
+  Widget _buildRow1(Plane aircraft,BuildContext context) {
 
     return ListTile(
       title: Text(
-        aircraft.toString()+"\n",
+        aircraft.id.toString()+"\n",
         style: _biggerFont,
       ),
       //isThreeLine: true,
@@ -252,9 +269,16 @@ class _ManageSectionState extends State<ManageSection> {
     //         ),
 
 
-    onTap: () {      
-        getPlanesByManufacturer(aircraft, context);
-    },
+    // onTap: () {      
+    //     getPlanesByManufacturer(aircraft, context);
+    // },
+      trailing: FlatButton(
+              onPressed: () { _showMyDialog(aircraft,context); },
+              child: Text(
+                "Delete",
+              ),
+              color: Colors.red,
+            ),
       
 
     );

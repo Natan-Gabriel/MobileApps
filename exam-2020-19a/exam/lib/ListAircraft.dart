@@ -1,5 +1,8 @@
 import 'package:airport_manager/ManageSection.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
+import 'Reports.dart';
 import 'domain/Plane.dart';
 import 'server/server.dart';
 import 'package:airport_manager/size_config/size_config.dart';
@@ -13,6 +16,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
 
 class ListAircraft extends StatefulWidget {
+  final channel = IOWebSocketChannel.connect('ws://10.0.2.2:1876');
   @override
   _ListAircraftState createState() => _ListAircraftState();
 }
@@ -26,6 +30,9 @@ class _ListAircraftState extends State<ListAircraft> {
 
   List<Plane> _toAdd = [];  
 
+  //final channel = IOWebSocketChannel.connect('ws://echo.websocket.org');
+
+
   var connectivityResult;
 
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
@@ -38,7 +45,12 @@ class _ListAircraftState extends State<ListAircraft> {
 
     _refreshList(context);
 
+    connectivityResult= Connectivity().checkConnectivity();
 
+    connectivityResult.then((data){
+      connectivityResult=data;
+    });
+    // connectivityResult.then((val){print("val: "+val.toString());});
     
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
     // Got a new connectivity status!
@@ -116,7 +128,8 @@ class _ListAircraftState extends State<ListAircraft> {
             icon: Icon(Icons.sync),
             onPressed: () { sync(context); },
           ),
-          )
+          ),
+          
 
         ],
       ),
@@ -127,10 +140,21 @@ class _ListAircraftState extends State<ListAircraft> {
         // Add a ListView to the drawer. This ensures the user can scroll
         // through the options in the drawer if there isn't enough vertical
         // space to fit everything.
-        child: ListView(
+        child: Builder(builder: (_context) => ListView(
           // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
-          children: <Widget>[
+          children:  <Widget>[
+            StreamBuilder(
+              stream: widget.channel.stream,
+              builder: (context, snapshot) {
+               // showSnackBar(_context, "Websocket");
+               print("websocket reached");
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24.0),
+                  child: Text(snapshot.hasData ? '${snapshot.data}' : ''),
+                );
+              },
+            ),
             DrawerHeader(
               child: Text('Drawer Header'),
               decoration: BoxDecoration(
@@ -150,11 +174,17 @@ class _ListAircraftState extends State<ListAircraft> {
             ListTile(
               title: Text('Manage section'),
               onTap: () {
+                if(connectivityResult!=ConnectivityResult.mobile && connectivityResult!=ConnectivityResult.wifi){
+                  Navigator.pop(context);
+                  showSnackBar(_context, "Please connect to the internet");
+                }
+                else{
                 Navigator.push(context, MaterialPageRoute(
                   builder: (context) =>
                      ManageSection()
                   
                 ));
+                }
 
                 //Navigator.pop(context);
               },
@@ -162,14 +192,22 @@ class _ListAircraftState extends State<ListAircraft> {
             ListTile(
               title: Text('Reports section'),
               onTap: () {
-                // Update the state of the app
-                // ...
-                // Then close the drawer
-                Navigator.pop(context);
+                if(connectivityResult!=ConnectivityResult.mobile && connectivityResult!=ConnectivityResult.wifi){
+                  Navigator.pop(context);
+                  showSnackBar(_context, "Please connect to the internet");
+                }
+                else{
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) =>
+                     Reports()
+                  
+                ));
+                }
               },
             ),
           ],
         ),
+        )
       ),
       floatingActionButton: Builder(builder: (context) => FloatingActionButton(
         onPressed : () => _add(context),
@@ -243,55 +281,55 @@ class _ListAircraftState extends State<ListAircraft> {
      
   }
 
-  Future<void> _showMyDialog(Aircraft aircraft,BuildContext _context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
+//   Future<void> _showMyDialog(Aircraft aircraft,BuildContext _context) async {
+//     return showDialog<void>(
+//       context: context,
+//       barrierDismissible: false, // user must tap button!
+//       builder: (BuildContext context) {
         
-        return AlertDialog(
-          title: Text('Alert!'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Are you sure you want to delete this item?'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('NO',style: new TextStyle(color: Colors.green)),
+//         return AlertDialog(
+//           title: Text('Alert!'),
+//           content: SingleChildScrollView(
+//             child: ListBody(
+//               children: <Widget>[
+//                 Text('Are you sure you want to delete this item?'),
+//               ],
+//             ),
+//           ),
+//           actions: <Widget>[
+//             TextButton(
+//               child: Text('NO',style: new TextStyle(color: Colors.green)),
               
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+//               onPressed: () {
+//                 Navigator.of(context).pop();
+//               },
             
               
-            ),
-            TextButton(
-              child: Text('YES',style: new TextStyle(color: Colors.green)),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                // setState(() => _aircrafts.remove(aircraft));
-                int result=0;
-                if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-                  result = await Server.delete(aircraft.tailNumber);
-                }
-                if(result==200){
-                  //db.delete(aircraft.id);
-                  _refreshList(_context);
-                  showSnackBar(_context, 'The item was successfully deleted !'); 
-                }
-                else{
-                  showSnackBar(_context, 'This operation is not available offline!');
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-}  
+//             ),
+//             TextButton(
+//               child: Text('YES',style: new TextStyle(color: Colors.green)),
+//               onPressed: () async {
+//                 Navigator.of(context).pop();
+//                 // setState(() => _aircrafts.remove(aircraft));
+//                 int result=0;
+//                 if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+//                   result = await Server.delete(aircraft.tailNumber);
+//                 }
+//                 if(result==200){
+//                   //db.delete(aircraft.id);
+//                   _refreshList(_context);
+//                   showSnackBar(_context, 'The item was successfully deleted !'); 
+//                 }
+//                 else{
+//                   showSnackBar(_context, 'This operation is not available offline!');
+//                 }
+//               },
+//             ),
+//           ],
+//         );
+//       },
+//     );
+// }  
 
     Widget _buildAircrafts1() {
     return ListView.builder(

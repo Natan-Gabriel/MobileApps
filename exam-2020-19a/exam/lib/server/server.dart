@@ -75,11 +75,11 @@ class Server{
   }
   }
 
-  static Future<int> delete(String id) async {
+  static Future<int> delete(int id) async {
     // print("aircraft: "+aircraft.toString());
     try{
     final http.Response response = await http.delete(
-      new Uri.http(url, "/aircraft"+"/"+ id)
+      new Uri.http(url, "/plane"+"/"+ id.toString())
     );
     return response.statusCode;
     }
@@ -89,6 +89,8 @@ class Server{
     }
       
   }
+
+
 
 
   // A method that retrieves all the dogs from the dogs table.
@@ -114,6 +116,29 @@ class Server{
   }
 
 
+  static Future<List<Plane>> getAllOrdered() async {
+
+    final response = await http.get(new Uri.http(url, '/all'));
+    List<Plane> aircrafts = List<Plane>();
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    for(Map<String, dynamic> aircraft in jsonDecode(response.body)){
+      print(aircraft['id']);
+      //aircrafts.add(Plane.fromMap(aircraft));
+      aircrafts.add(Plane(aircraft['id'], aircraft['name'], aircraft['status'], aircraft['size'], aircraft['owner'], aircraft['manufacturer'], aircraft['capacity']));
+    }
+    aircrafts.sort((a, b) => a.size.compareTo(b.size));
+    return aircrafts;
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load album');
+  }
+  }
+
+
   static Future<List<String>> getManufacturers() async {
 
     final response = await http.get(new Uri.http(url, '/types'));
@@ -126,6 +151,28 @@ class Server{
       //print(aircraft['id']);
       //aircrafts.add(Plane.fromMap(aircraft));
       aircrafts.add(aircraft);
+    }
+    return aircrafts;
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load album');
+  }
+  }
+
+  static Future<List<Plane>> getAvailable(String manufacturer) async {
+
+    final response = await http.get(new Uri.http(url, '/planes'+"/"+ manufacturer));
+    List<Plane> aircrafts = List<Plane>();
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    for(Map<String, dynamic> aircraft in jsonDecode(response.body)){
+      print(aircraft['id']);
+      //if(manufacturer==aircraft['manufacturer'])
+      //aircrafts.add(Plane.fromMap(aircraft));
+      aircrafts.add(Plane(aircraft['id'], aircraft['name'], aircraft['status'], aircraft['size'], aircraft['owner'], aircraft['manufacturer'], aircraft['capacity']));
     }
     return aircrafts;
   } else {

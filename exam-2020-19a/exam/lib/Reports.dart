@@ -1,7 +1,8 @@
 
-import 'package:airport_manager/ListAircraft.dart';
-import 'package:airport_manager/Reports.dart';
 
+import 'package:airport_manager/ListAircraft.dart';
+
+import 'ManageSection.dart';
 import 'PlanesByManufacturer.dart';
 import 'domain/Plane.dart';
 import 'server/server.dart';
@@ -15,17 +16,23 @@ import 'dart:developer' as developer;
 import 'package:connectivity/connectivity.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
 
-class ManageSection extends StatefulWidget {
+class Reports extends StatefulWidget {
+
   @override
-  _ManageSectionState createState() => _ManageSectionState();
+  _ReportsState createState() => _ReportsState();
 }
 
-class _ManageSectionState extends State<ManageSection> {
+class _ReportsState extends State<Reports> {
+
+
+  // final Plane _aircraft;
+
+  // _PlanesByManufacturerState(this._aircraft);
 
   Db db; 
   Server server;//=new Server();
 
-  List<String> _manufacturers = [];  
+  List<Plane> _manufacturers = [];  
 
   int selected=-1;
 
@@ -36,7 +43,7 @@ class _ManageSectionState extends State<ManageSection> {
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     db = Db.instance;
     server =new Server(); 
@@ -48,52 +55,16 @@ class _ManageSectionState extends State<ManageSection> {
     connectivityResult.then((data){
       connectivityResult=data;
     });
+    // connectivityResult.then((val){print("val: "+val.toString());});
+    
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
     // Got a new connectivity status!
       print("Connectivity: " + result.toString());
       connectivityResult=result;
-      //connectivityResult.then((val){print("val: "+val.toString());});
-      if(result==ConnectivityResult.mobile || result==ConnectivityResult.wifi){  
-        print("aici");
-        for (Plane plane in _toAdd){
-            Server.add(plane);
-        }
-         //await sync(context);
-
-      }
     });
   
   }
 
-  // void sync(BuildContext context) async{
-  //   if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-  //       List<Plane> aircrafts_on_db = await db.getAll();
-  //       List<Plane> aircrafts_on_server = await Server.getAll();
-  //       print("aircrafts_on_server: "+aircrafts_on_server.toString());
-  //       for (Plane aircraft in aircrafts_on_db){
-  //         if (!aircrafts_on_server.contains(aircraft)){
-  //             db.delete(aircraft.id);
-  //         }
-  //       }
-
-  //       for (Plane aircraft in aircrafts_on_server){
-  //         if (!aircrafts_on_db.contains(aircraft)){
-  //             db.add(aircraft);
-  //         }
-  //       }
-  //       setState(() {
-  //         _toAdd = [];
-  //       });
-  //   }
-
-        
-  //       _refreshList(context);
-  // }
-
-  // getStatus() async{
-  //   connectivityResult = await (Connectivity().checkConnectivity());
-  //   print("Connectivity: " + connectivityResult.toString());
-  // }
 
   _refreshList(BuildContext context) async {
     if(connectivityResult == ConnectivityResult.none){
@@ -102,7 +73,7 @@ class _ManageSectionState extends State<ManageSection> {
     }
     else{
       print("_refreshList entered");
-      List<String> x = await Server.getManufacturers();
+      List<Plane> x = await Server.getAllOrdered();
       setState(() {
         _manufacturers = x;
       });
@@ -116,7 +87,7 @@ class _ManageSectionState extends State<ManageSection> {
 
     return Scaffold (                    
       appBar: AppBar(
-        title: Text('Manage'),
+        title: Text('Reports'),
       ),
 
       //body:Builder(builder: (_context) =>_buildAircrafts1(_context)),// Builder(builder: (_context) =>_buildAircrafts1(_context)),//createTable(),//_buildAircrafts(),//createTable(),  <-if you want the version from previous lab
@@ -153,7 +124,17 @@ class _ManageSectionState extends State<ManageSection> {
                 // Update the state of the app
                 // ...
                 // Then close the drawer
-                Navigator.pop(context);
+                if(connectivityResult!=ConnectivityResult.mobile && connectivityResult!=ConnectivityResult.wifi){
+                  Navigator.pop(context);
+                  showSnackBar(_context, "Please connect to the internet");
+                }
+                else{
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) =>
+                     ManageSection()
+                  
+                ));
+                }
               },
             ),
             ListTile(
@@ -162,17 +143,7 @@ class _ManageSectionState extends State<ManageSection> {
                 // Update the state of the app
                 // ...
                 // Then close the drawer
-                if(connectivityResult!=ConnectivityResult.mobile && connectivityResult!=ConnectivityResult.wifi){
-                  Navigator.pop(context);
-                  showSnackBar(_context, "Please connect to the internet");
-                }
-                else{
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) =>
-                     Reports()
-                  
-                ));
-                }
+                Navigator.pop(context);
               },
             ),
           ],
@@ -184,6 +155,7 @@ class _ManageSectionState extends State<ManageSection> {
       
       );                                      
   }
+  
 
   
 
@@ -232,11 +204,11 @@ class _ManageSectionState extends State<ManageSection> {
 
   }
 
-  Widget _buildRow1(String aircraft,BuildContext context) {
+  Widget _buildRow1(Plane aircraft,BuildContext context) {
 
     return ListTile(
       title: Text(
-        aircraft.toString()+"\n",
+        "Id: "+aircraft.id.toString()+"\n"+"Size: "+aircraft.size.toString()+"\n",
         style: _biggerFont,
       ),
       //isThreeLine: true,
@@ -252,43 +224,11 @@ class _ManageSectionState extends State<ManageSection> {
     //         ),
 
 
-    onTap: () {      
-        getPlanesByManufacturer(aircraft, context);
-    },
+   
       
 
     );
   }
-
-
-  void getPlanesByManufacturer(String aircraft,BuildContext context) async{
-    Navigator.push(context, MaterialPageRoute(
-                  builder: (context) =>
-                     PlanesByManufacturer(aircraft)
-                  
-                ));
-    
-    // if(aircraft!=null){
-    //   int result = 0;
-    //   db.add(aircraft);
-    //     _refreshList(context); 
-    //   if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-    //     result= await Server.add(aircraft);
-        
-    //     print("result"+result.toString());
-    //   }
-    //   if(result==200){
-    //     // db.add(aircraft);
-    //     // _refreshList(context); 
-    //     showSnackBar(context,'The item was successfully created !');
-    //   }
-    //   else{
-    //     setState(() => _toAdd.add(aircraft)); 
-    //     showSnackBar(context,'The item was successfully created !(locally)');
-    //   }
-      
-      
-    // }
     
   }
 
@@ -300,7 +240,7 @@ class _ManageSectionState extends State<ManageSection> {
   }
 
 
-}
+
 
 
 class SnackBarPage extends StatelessWidget {
