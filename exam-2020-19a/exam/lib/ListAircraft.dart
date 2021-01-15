@@ -86,9 +86,11 @@ class _ListAircraftState extends State<ListAircraft> {
       connectivityResult=result;
       if(result==ConnectivityResult.mobile || result==ConnectivityResult.wifi){  
         print("aici");
+        setProgressBar();
         for (Plane plane in _toAdd){
             Server.add(plane);
         }
+        setProgressBar();
          await sync(context);
 
       }
@@ -102,7 +104,6 @@ class _ListAircraftState extends State<ListAircraft> {
         setProgressBar();
         List<Plane> aircrafts_on_db = await db.getAll();
         List<Plane> aircrafts_on_server = await Server.getAll();
-        setProgressBar();
         print("aircrafts_on_server: "+aircrafts_on_server.toString());
         for (Plane aircraft in aircrafts_on_db){
           if (!aircrafts_on_server.contains(aircraft)){
@@ -115,6 +116,7 @@ class _ListAircraftState extends State<ListAircraft> {
               db.add(aircraft);
           }
         }
+        setProgressBar();
         setState(() {
           _toAdd = [];
         });
@@ -296,7 +298,9 @@ class _ListAircraftState extends State<ListAircraft> {
         result= await Server.update(resultAircraft);
       }
       if(result==200){
+        setProgressBar();
         db.update(resultAircraft);
+        setProgressBar();
         _refreshList(context); 
         showSnackBar(context,'The item was successfully updated !');
       }

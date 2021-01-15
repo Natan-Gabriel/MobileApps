@@ -25,6 +25,7 @@ class Reports extends StatefulWidget {
 class _ReportsState extends State<Reports> {
 
 
+  bool _progressBarActive = false;
   // final Plane _aircraft;
 
   // _PlanesByManufacturerState(this._aircraft);
@@ -73,12 +74,20 @@ class _ReportsState extends State<Reports> {
     }
     else{
       print("_refreshList entered");
+      setProgressBar();
       List<Plane> x = await Server.getAllOrdered();
+      setProgressBar();
       setState(() {
         _manufacturers = x;
       });
     }
     
+  }
+
+  void setProgressBar(){
+    setState(() {
+      _progressBarActive=!_progressBarActive;
+    });
   }
 
 
@@ -88,6 +97,12 @@ class _ReportsState extends State<Reports> {
     return Scaffold (                    
       appBar: AppBar(
         title: Text('Reports'),
+        bottom: PreferredSize(
+                  preferredSize: Size(double.infinity, 1.0),
+                  child: _progressBarActive == true?const LinearProgressIndicator(
+                    backgroundColor: Colors.black,
+                  ):new Container(),
+        ),
       ),
 
       //body:Builder(builder: (_context) =>_buildAircrafts1(_context)),// Builder(builder: (_context) =>_buildAircrafts1(_context)),//createTable(),//_buildAircrafts(),//createTable(),  <-if you want the version from previous lab
@@ -160,48 +175,18 @@ class _ReportsState extends State<Reports> {
   
 
     Widget _buildAircrafts1(){
-    // Future<ConnectivityResult> c= Connectivity().checkConnectivity();
-    // ConnectivityResult res;
-    // c.then((data){
-    //   res=data;
-    //   if(res!=ConnectivityResult.mobile && res!=ConnectivityResult.wifi){
-    //     print("SnackBarPage should be displayed");
-    //     return SnackBarPage();
-    //   }
-    //   else{
-    //     print("else brach reached");
-        return ListView.builder(
-      padding: const EdgeInsets.only(top:16,left:16,right:16,bottom: 80),
-       itemCount: _manufacturers.length*2,
-      // The itemBuilder callback is called once per suggested 
-      // word pairing, and places each suggestion into a ListTile
-      // row. For even rows, the function adds a ListTile row for
-      // the word pairing. For odd rows, the function adds a 
-      // Divider widget to visually separate the entries. Note that
-      // the divider may be difficult to see on smaller devices.
-      itemBuilder: (BuildContext _context, int i) {
-        // Add a one-pixel-high divider widget before each row 
-        // in the ListView.
-        if (i.isOdd) {
-          return Divider();
+      return ListView.builder(
+        padding: const EdgeInsets.only(top:16,left:16,right:16,bottom: 80),
+        itemCount: _manufacturers.length*2,
+        itemBuilder: (BuildContext _context, int i) {
+          if (i.isOdd) {
+            return Divider();
+          }
+          final int index = i ~/ 2;
+          print("selected: "+selected.toString());
+          return _buildRow1(_manufacturers[index], _context);
         }
-        // The syntax "i ~/ 2" divides i by 2 and returns an 
-        // integer result.
-
-        final int index = i ~/ 2;
-        print("selected: "+selected.toString());
-        // if(selected==index){
-          
-        //   return _buildSelectedRow1(_manufacturers[index], _context);  
-        // }
-        return _buildRow1(_manufacturers[index], _context);
-      }
     );
-      //}
-
-    //});
-
-
   }
 
   Widget _buildRow1(Plane aircraft,BuildContext context) {
@@ -239,32 +224,3 @@ class _ReportsState extends State<Reports> {
     Scaffold.of(_context).showSnackBar(snackBar);
   }
 
-
-
-
-
-class SnackBarPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: ElevatedButton(
-        onPressed: () {
-          final snackBar = SnackBar(
-            content: Text('Yay! A SnackBar!'),
-            action: SnackBarAction(
-              label: 'Undo',
-              onPressed: () {
-                // Some code to undo the change.
-              },
-            ),
-          );
-
-          // Find the Scaffold in the widget tree and use
-          // it to show a SnackBar.
-          Scaffold.of(context).showSnackBar(snackBar);
-        },
-        child: Text('Show SnackBar'),
-      ),
-    );
-  }
-}

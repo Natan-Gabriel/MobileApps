@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 import 'dart:async';
 
 import 'package:path/path.dart';
@@ -57,69 +58,107 @@ class Db{
     // print('db location : '+dbPath);
     
     // Get a reference to the database.
-    Database db = await database;
+    try{
+      Database db = await database;
 
-    // Insert the Dog into the correct table. You might also specify the
-    // `conflictAlgorithm` to use in case the same dog is inserted twice.
-    //
-    // In this case, replace any previous data.
-    await db.insert(
-      'planes',
-      plane.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-}
-
-
-  // A method that retrieves all the dogs from the dogs table.
-  Future<List<Plane>> getAll() async {
-    // Get a reference to the database.
-    final Database db = await database;
-
-    // Query the table for all The Dogs.
-    final List<Map<String, dynamic>> maps = await db.query('planes');
-
-    // Convert the List<Map<String, dynamic> into a List<Dog>.
-    return List.generate(maps.length, (i) {
-      return Plane(
-        maps[i]['id'],
-        maps[i]['name'],
-        maps[i]['status'],
-        maps[i]['size'],
-        maps[i]['owner'],
-        maps[i]['manufacturer'],
-        maps[i]['capacity'],
+      // Insert the Dog into the correct table. You might also specify the
+      // `conflictAlgorithm` to use in case the same dog is inserted twice.
+      //
+      // In this case, replace any previous data.
+      await db.insert(
+        'planes',
+        plane.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
       );
-    });
-  }
+      developer.log("add of "+plane.toString()+" to the db was successful",name: 'exam.db');
+    }
+    catch(exp){
+      print(exp);
+      developer.log("add of "+plane.toString()+" threw the following error: ",name: 'exam.db',
+        error: exp);
+      throw exp;
+    }
+}
   
-  Future<void> update(Aircraft aircraft) async {
-    // Get a reference to the database.
-    Database db = await database;
+  Future<void> update(Aircraft entity) async {
 
-    // Update the given Dog.
-    await db.update(
-      'aircrafts',
-      aircraft.toMap(),
-      // Ensure that the Dog has a matching id.
-      where: "tailNumber = ?",
-      // Pass the Dog's id as a whereArg to prevent SQL injection.
-      whereArgs: [aircraft.tailNumber],
-    );
+
+    try{
+      Database db = await database;
+
+      // Update the given Dog.
+      await db.update(
+        'aircrafts',
+        entity.toMap(),
+        // Ensure that the Dog has a matching id.
+        where: "tailNumber = ?",
+        // Pass the Dog's id as a whereArg to prevent SQL injection.
+        whereArgs: [entity.tailNumber],
+      );
+      developer.log("update to "+entity.toString()+" in the db was successful",name: 'exam.db');
+
+    }
+    catch(exp){
+      print(exp);
+      developer.log("update to " + entity.toString()+" threw the following error: ",name: 'exam.db',
+        error: exp);
+      throw exp;
+    }
   }
 
   Future<void> delete(int id) async {
-  // Get a reference to the database.
-    Database db = await database;
 
-    // Remove the Dog from the Database.
-    await db.delete(
-      'planes',
-      // Use a `where` clause to delete a specific dog.
-      where: "id = ?",
-      // Pass the Dog's id as a whereArg to prevent SQL injection.
-      whereArgs: [id],
-    );
+    try{
+      Database db = await database;
+
+      // Remove the Dog from the Database.
+      await db.delete(
+        'planes',
+        // Use a `where` clause to delete a specific dog.
+        where: "id = ?",
+        // Pass the Dog's id as a whereArg to prevent SQL injection.
+        whereArgs: [id],
+      );
+      developer.log("entity having id "+id.toString()+" was successfully deleted",name: 'exam.db');
+    }
+    catch(exp){
+      print(exp);
+      developer.log("delete of plane with id "+id.toString() + "threw the following error: ",name: 'exam.db',
+        error: exp);
+      throw exp;
+    }
+  }
+
+  // A method that retrieves all the dogs from the dogs table.
+  Future<List<Plane>> getAll() async {
+
+    try{
+      final Database db = await database;
+
+      // Query the table for all The Dogs.
+      final List<Map<String, dynamic>> maps = await db.query('planes');
+
+      // Convert the List<Map<String, dynamic> into a List<Dog>.
+      List<Plane> res=List.generate(maps.length, (i) {
+        return Plane(
+          maps[i]['id'],
+          maps[i]['name'],
+          maps[i]['status'],
+          maps[i]['size'],
+          maps[i]['owner'],
+          maps[i]['manufacturer'],
+          maps[i]['capacity'],
+        );
+      });
+      developer.log("getAll call to the db was successful",name: 'exam.db');
+      return res;
+    }
+    catch(exp){
+      print(exp);
+      developer.log("getAll threw the following error: ",name: 'exam.db',
+        error: exp);
+      throw(exp);
+    }
   }
 
 }

@@ -22,6 +22,8 @@ class ManageSection extends StatefulWidget {
 
 class _ManageSectionState extends State<ManageSection> {
 
+  bool _progressBarActive = false;
+
   Db db; 
   Server server;//=new Server();
 
@@ -55,14 +57,22 @@ class _ManageSectionState extends State<ManageSection> {
       //connectivityResult.then((val){print("val: "+val.toString());});
       if(result==ConnectivityResult.mobile || result==ConnectivityResult.wifi){  
         print("aici");
+        setProgressBar();
         for (Plane plane in _toAdd){
             Server.add(plane);
         }
+        setProgressBar();
          //await sync(context);
 
       }
     });
   
+  }
+
+  void setProgressBar(){
+    setState(() {
+      _progressBarActive=!_progressBarActive;
+    });
   }
 
   // void sync(BuildContext context) async{
@@ -102,7 +112,9 @@ class _ManageSectionState extends State<ManageSection> {
     }
     else{
       print("_refreshList entered");
+      setProgressBar();
       List<String> x = await Server.getManufacturers();
+      setProgressBar();
       setState(() {
         _manufacturers = x;
       });
@@ -117,6 +129,12 @@ class _ManageSectionState extends State<ManageSection> {
     return Scaffold (                    
       appBar: AppBar(
         title: Text('Manage'),
+        bottom: PreferredSize(
+                  preferredSize: Size(double.infinity, 1.0),
+                  child: _progressBarActive == true?const LinearProgressIndicator(
+                    backgroundColor: Colors.black,
+                  ):new Container(),
+        ),
       ),
 
       //body:Builder(builder: (_context) =>_buildAircrafts1(_context)),// Builder(builder: (_context) =>_buildAircrafts1(_context)),//createTable(),//_buildAircrafts(),//createTable(),  <-if you want the version from previous lab
@@ -300,31 +318,4 @@ class _ManageSectionState extends State<ManageSection> {
   }
 
 
-}
-
-
-class SnackBarPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: ElevatedButton(
-        onPressed: () {
-          final snackBar = SnackBar(
-            content: Text('Yay! A SnackBar!'),
-            action: SnackBarAction(
-              label: 'Undo',
-              onPressed: () {
-                // Some code to undo the change.
-              },
-            ),
-          );
-
-          // Find the Scaffold in the widget tree and use
-          // it to show a SnackBar.
-          Scaffold.of(context).showSnackBar(snackBar);
-        },
-        child: Text('Show SnackBar'),
-      ),
-    );
-  }
 }
