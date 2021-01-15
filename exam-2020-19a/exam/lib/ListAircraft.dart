@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:airport_manager/ManageSection.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -28,8 +30,12 @@ class _ListAircraftState extends State<ListAircraft> {
 
   _ListAircraftState({this.channel}) {
     channel.stream.listen((data) {
-      print("Websocket works!!");
-      showSnackBar(__context, "Websocket works!!");
+      print("Websocket works!!.Data: "+data.toString());
+      Map userMap = jsonDecode(data);
+      var data_decoded = Plane.fromMap(userMap);
+      //showSnackBar(__context, "Websocket works!!");
+      String message="Another user just added a plane. The plane has the name: "+data_decoded.name+", the size: "+data_decoded.size.toString()+" and the owner: "+data_decoded.owner;
+      customDialog(message,__context);
       //initState(() {});
       sync(__context);
     });
@@ -299,6 +305,38 @@ class _ListAircraftState extends State<ListAircraft> {
     
      
   }
+
+  Future<void> customDialog(String message,BuildContext _context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        
+        return AlertDialog(
+          title: Text('Notification'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(message),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Ok',style: new TextStyle(color: Colors.green)),
+              
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            
+              
+            ),
+            
+          ],
+        );
+      },
+    );
+}
 
 //   Future<void> _showMyDialog(Aircraft aircraft,BuildContext _context) async {
 //     return showDialog<void>(

@@ -27,10 +27,10 @@ class Plane {
     this.id = map['id'];
     this.name = map['name'];
     this.status = map['status'];
-    this.size = int.parse(map['size']);
+    this.size = map['size'];
     this.owner = map['owner'];
     this.manufacturer = map['manufacturer'];
-    this.capacity = int.parse(map['capacity']);
+    this.capacity = map['capacity'];
   }
 
 @override
