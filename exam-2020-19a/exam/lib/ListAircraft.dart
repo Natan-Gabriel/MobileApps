@@ -18,10 +18,28 @@ import 'package:data_connection_checker/data_connection_checker.dart';
 class ListAircraft extends StatefulWidget {
   final channel = IOWebSocketChannel.connect('ws://10.0.2.2:1876');
   @override
-  _ListAircraftState createState() => _ListAircraftState();
+  _ListAircraftState createState() => _ListAircraftState(channel:channel);
 }
 
 class _ListAircraftState extends State<ListAircraft> {
+
+
+  final WebSocketChannel channel;
+
+  _ListAircraftState({this.channel}) {
+    channel.stream.listen((data) {
+      print("Websocket works!!");
+      showSnackBar(__context, "Websocket works!!");
+      setState(() {
+        message="Message";
+        //print(data);
+      });
+    });
+  }
+
+  BuildContext __context;
+
+  String message="";
 
   Db db; 
   Server server;//=new Server();
@@ -43,7 +61,11 @@ class _ListAircraftState extends State<ListAircraft> {
     db = Db.instance;
     server =new Server(); 
 
+    
+
     _refreshList(context);
+
+   // showSnackBar(__context, message);
 
     connectivityResult= Connectivity().checkConnectivity();
 
@@ -69,6 +91,7 @@ class _ListAircraftState extends State<ListAircraft> {
   }
 
   void sync(BuildContext context) async{
+    //__context=context;
     if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
         List<Plane> aircrafts_on_db = await db.getAll();
         List<Plane> aircrafts_on_server = await Server.getAll();
@@ -106,7 +129,7 @@ class _ListAircraftState extends State<ListAircraft> {
     });
     if(connectivityResult == ConnectivityResult.none){
       print("connectivityResult == ConnectivityResult.none");
-      showSnackBar(context,'The server connection is down.Retry using sync button');
+      showSnackBar(__context,'The server connection is down.Retry using sync button');
     }
   }
 
@@ -135,7 +158,7 @@ class _ListAircraftState extends State<ListAircraft> {
       ),
 
       
-      body: _buildAircrafts1(),//createTable(),//_buildAircrafts(),//createTable(),  <-if you want the version from previous lab
+      body: Builder(builder: (_context) => _buildAircrafts1(_context)),//createTable(),//_buildAircrafts(),//createTable(),  <-if you want the version from previous lab
       drawer: Drawer(
         // Add a ListView to the drawer. This ensures the user can scroll
         // through the options in the drawer if there isn't enough vertical
@@ -144,17 +167,17 @@ class _ListAircraftState extends State<ListAircraft> {
           // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
           children:  <Widget>[
-            StreamBuilder(
-              stream: widget.channel.stream,
-              builder: (context, snapshot) {
-               // showSnackBar(_context, "Websocket");
-               print("websocket reached");
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24.0),
-                  child: Text(snapshot.hasData ? '${snapshot.data}' : ''),
-                );
-              },
-            ),
+            // StreamBuilder(
+            //   stream: widget.channel.stream,
+            //   builder: (context, snapshot) {
+            //    // showSnackBar(_context, "Websocket");
+            //    print("websocket reached");
+            //     return Padding(
+            //       padding: const EdgeInsets.symmetric(vertical: 24.0),
+            //       child: Text(snapshot.hasData ? '${snapshot.data}' : ''),
+            //     );
+            //   },
+            // ),
             DrawerHeader(
               child: Text('Drawer Header'),
               decoration: BoxDecoration(
@@ -331,7 +354,8 @@ class _ListAircraftState extends State<ListAircraft> {
 //     );
 // }  
 
-    Widget _buildAircrafts1() {
+    Widget _buildAircrafts1(BuildContext _context) {
+      __context=_context;
     return ListView.builder(
       padding: const EdgeInsets.only(top:16,left:16,right:16,bottom: 80),
        itemCount: _aircrafts.length*2,
