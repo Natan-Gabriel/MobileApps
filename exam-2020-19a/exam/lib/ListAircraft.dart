@@ -26,6 +26,7 @@ class ListAircraft extends StatefulWidget {
 class _ListAircraftState extends State<ListAircraft> {
 
 
+  bool _progressBarActive = false;
   final WebSocketChannel channel;
 
   _ListAircraftState({this.channel}) {
@@ -93,10 +94,16 @@ class _ListAircraftState extends State<ListAircraft> {
   }
 
   void sync(BuildContext context) async{
+    // setProgressBar();
+    //     List<Plane> aircrafts_on_server = await Server.getAll();
+    //     setProgressBar();
     //__context=context;
     if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+        //setProgressBar();
         List<Plane> aircrafts_on_db = await db.getAll();
+        setProgressBar();
         List<Plane> aircrafts_on_server = await Server.getAll();
+        setProgressBar();
         print("aircrafts_on_server: "+aircrafts_on_server.toString());
         for (Plane aircraft in aircrafts_on_db){
           if (!aircrafts_on_server.contains(aircraft)){
@@ -116,6 +123,12 @@ class _ListAircraftState extends State<ListAircraft> {
 
         
         _refreshList(context);
+  }
+
+  void setProgressBar(){
+    setState(() {
+      _progressBarActive=!_progressBarActive;
+    });
   }
 
   // getStatus() async{
@@ -142,6 +155,25 @@ class _ListAircraftState extends State<ListAircraft> {
     return Scaffold (                    
       appBar: AppBar(
         title: Text('Registration'),
+        //_progressBarActive == true?const CircularProgressIndicator():new Container()
+    //     bottom:_progressBarActive == true?const PreferredSize(
+    //           preferredSize: Size(double.infinity, 1.0),
+    //           child: LinearProgressIndicator(
+    //             backgroundColor: Colors.black,
+    //           ),
+    // ):PreferredSize(
+    //           preferredSize: Size(double.infinity, 1.0),
+    //           child:new Container(),
+    // ),
+
+    bottom: PreferredSize(
+              preferredSize: Size(double.infinity, 1.0),
+              child: _progressBarActive == true?const LinearProgressIndicator(
+                backgroundColor: Colors.black,
+              ):new Container(),
+    ),
+
+
   //       leading: Builder(builder: (context) => FlatButton(
   //   onPressed: () { sync(context); },
   //   child: Icon(
@@ -154,7 +186,7 @@ class _ListAircraftState extends State<ListAircraft> {
             onPressed: () { sync(context); },
           ),
           ),
-          
+          //Builder(builder: (_context) => _progressBarActive == true?const CircularProgressIndicator():new Container()),
 
         ],
       ),
@@ -239,7 +271,8 @@ class _ListAircraftState extends State<ListAircraft> {
         tooltip: 'Increment',
         child: const Icon(Icons.add),backgroundColor: Colors.green,
       )
-      )
+      ),
+
       
       );                                      
   }
@@ -259,7 +292,23 @@ class _ListAircraftState extends State<ListAircraft> {
       db.add(aircraft);
         _refreshList(context); 
       if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+        // FutureBuilder
+        setProgressBar();
         result= await Server.add(aircraft);
+        setProgressBar();
+    //   Widget w=FutureBuilder(
+    //   future: result1,
+    //   builder: (__context, snapshot) {
+    //     if (snapshot.connectionState == ConnectionState.done) {
+    //        return CircularProgressIndicator();
+    //     }
+    //     else {
+    //       return CircularProgressIndicator();
+    //     }
+    //   }
+    // );
+    // Scaffold.of(__context).
+        
         
         print("result"+result.toString());
       }
