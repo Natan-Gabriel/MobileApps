@@ -30,16 +30,12 @@ class _ListAircraftState extends State<ListAircraft> {
     channel.stream.listen((data) {
       print("Websocket works!!");
       showSnackBar(__context, "Websocket works!!");
-      setState(() {
-        message="Message";
-        //print(data);
-      });
+      //initState(() {});
+      sync(__context);
     });
   }
 
   BuildContext __context;
-
-  String message="";
 
   Db db; 
   Server server;//=new Server();
@@ -61,9 +57,9 @@ class _ListAircraftState extends State<ListAircraft> {
     db = Db.instance;
     server =new Server(); 
 
-    
+    sync(__context);
 
-    _refreshList(context);
+    //_refreshList(context);
 
    // showSnackBar(__context, message);
 
