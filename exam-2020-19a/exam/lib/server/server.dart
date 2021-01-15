@@ -1,7 +1,7 @@
 
 import 'dart:async';
 import 'dart:math';
-
+import 'dart:developer' as developer;
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/widgets.dart';
@@ -22,17 +22,12 @@ class Server{
   Server._();
 
   static Future<int> add(Plane plane) async {
-    // print("aircraft: "+aircraft.toString());
     try{
     final http.Response response = await http.post(
       new Uri.http(url, "/plane"),
-      // headers: {
-      //   'Content-Type': 'application/json; charset=UTF-8',
-      // },
-      //body: plane.toMap(),
       headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
     body: json.encode(plane.toMap()),
     //   body: json.encode(<String, dynamic>{
     //   "id": 93,
@@ -42,17 +37,19 @@ class Server{
     //   "owner": "93",
     //   "manufacturer": "93",
     //   "capacity": 93,
-      
-    // }) ,
-    //headers:{"content-type":"application/json"}
     );
+    throw new Exception("new exception");
+    developer.log("add of "+plane.toString()+" to the server returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.db');
     return response.statusCode;
     }
     catch(exp){
       // print("plane.toMap():");
       // print(plane.toMap());
+      developer.log("add of "+plane.toString()+" threw the following error: ",name: 'exam.db',
+        error: exp);
       print(exp);
-        return -1;
+      throw exp;
+       // return -1;
     }
   }
 

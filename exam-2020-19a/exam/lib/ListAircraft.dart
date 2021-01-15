@@ -36,9 +36,12 @@ class _ListAircraftState extends State<ListAircraft> {
       var data_decoded = Plane.fromMap(userMap);
       //showSnackBar(__context, "Websocket works!!");
       String message="Another user just added a plane. The plane has the name: "+data_decoded.name+", the size: "+data_decoded.size.toString()+" and the owner: "+data_decoded.owner;
-      customDialog(message,__context);
+      //customDialog(message,__context);
       //initState(() {});
       sync(__context);
+      print("__context here1 is: "+__context.toString());
+      //customDialog(message,__context);
+      showSnackBar(__context, message);
     });
   }
 
@@ -94,14 +97,10 @@ class _ListAircraftState extends State<ListAircraft> {
   }
 
   void sync(BuildContext context) async{
-    // setProgressBar();
-    //     List<Plane> aircrafts_on_server = await Server.getAll();
-    //     setProgressBar();
-    //__context=context;
+
     if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-        //setProgressBar();
-        List<Plane> aircrafts_on_db = await db.getAll();
         setProgressBar();
+        List<Plane> aircrafts_on_db = await db.getAll();
         List<Plane> aircrafts_on_server = await Server.getAll();
         setProgressBar();
         print("aircrafts_on_server: "+aircrafts_on_server.toString());
@@ -155,65 +154,31 @@ class _ListAircraftState extends State<ListAircraft> {
     return Scaffold (                    
       appBar: AppBar(
         title: Text('Registration'),
-        //_progressBarActive == true?const CircularProgressIndicator():new Container()
-    //     bottom:_progressBarActive == true?const PreferredSize(
-    //           preferredSize: Size(double.infinity, 1.0),
-    //           child: LinearProgressIndicator(
-    //             backgroundColor: Colors.black,
-    //           ),
-    // ):PreferredSize(
-    //           preferredSize: Size(double.infinity, 1.0),
-    //           child:new Container(),
-    // ),
+        bottom: PreferredSize(
+                  preferredSize: Size(double.infinity, 1.0),
+                  child: _progressBarActive == true?const LinearProgressIndicator(
+                    backgroundColor: Colors.black,
+                  ):new Container(),
+        ),
 
-    bottom: PreferredSize(
-              preferredSize: Size(double.infinity, 1.0),
-              child: _progressBarActive == true?const LinearProgressIndicator(
-                backgroundColor: Colors.black,
-              ):new Container(),
-    ),
-
-
-  //       leading: Builder(builder: (context) => FlatButton(
-  //   onPressed: () { sync(context); },
-  //   child: Icon(
-  //     Icons.sync,  // add custom icons also
-  //   ),
-  // )),
-  actions: <Widget>[
-          Builder(builder: (context) =>IconButton(
-            icon: Icon(Icons.sync),
-            onPressed: () { sync(context); },
-          ),
-          ),
-          //Builder(builder: (_context) => _progressBarActive == true?const CircularProgressIndicator():new Container()),
-
+        actions: <Widget>[
+                Builder(builder: (context) =>IconButton(
+                  icon: Icon(Icons.sync),
+                  onPressed: () { sync(context); },
+                ),
+                ),
         ],
       ),
 
       
       body: Builder(builder: (_context) => _buildAircrafts1(_context)),//createTable(),//_buildAircrafts(),//createTable(),  <-if you want the version from previous lab
       drawer: Drawer(
-        // Add a ListView to the drawer. This ensures the user can scroll
-        // through the options in the drawer if there isn't enough vertical
-        // space to fit everything.
         child: Builder(builder: (_context) => ListView(
           // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
           children:  <Widget>[
-            // StreamBuilder(
-            //   stream: widget.channel.stream,
-            //   builder: (context, snapshot) {
-            //    // showSnackBar(_context, "Websocket");
-            //    print("websocket reached");
-            //     return Padding(
-            //       padding: const EdgeInsets.symmetric(vertical: 24.0),
-            //       child: Text(snapshot.hasData ? '${snapshot.data}' : ''),
-            //     );
-            //   },
-            // ),
             DrawerHeader(
-              child: Text('Drawer Header'),
+              child: Text('Drawer'),
               decoration: BoxDecoration(
                 color: Colors.blue,
               ),
@@ -221,10 +186,6 @@ class _ListAircraftState extends State<ListAircraft> {
             ListTile(
               title: Text('Registration section'),
               onTap: () {
-                // Update the state of the app
-                // ...
-                // Then close the drawer
-                
                 Navigator.pop(context);
               },
             ),
@@ -243,7 +204,6 @@ class _ListAircraftState extends State<ListAircraft> {
                 ));
                 }
 
-                //Navigator.pop(context);
               },
             ),
             ListTile(
@@ -266,6 +226,7 @@ class _ListAircraftState extends State<ListAircraft> {
         ),
         )
       ),
+
       floatingActionButton: Builder(builder: (context) => FloatingActionButton(
         onPressed : () => _add(context),
         tooltip: 'Increment',
@@ -273,8 +234,7 @@ class _ListAircraftState extends State<ListAircraft> {
       )
       ),
 
-      
-      );                                      
+    );                                      
   }
 
 
@@ -289,26 +249,20 @@ class _ListAircraftState extends State<ListAircraft> {
     
     if(aircraft!=null){
       int result = 0;
+      setProgressBar();
       db.add(aircraft);
+      setProgressBar();
         _refreshList(context); 
       if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-        // FutureBuilder
         setProgressBar();
-        result= await Server.add(aircraft);
+        try{
+          result= await Server.add(aircraft);
+        }
+        catch(exp){
+          print("__context here2 is: "+__context.toString());
+          showSnackBar(__context, exp.toString());
+        }
         setProgressBar();
-    //   Widget w=FutureBuilder(
-    //   future: result1,
-    //   builder: (__context, snapshot) {
-    //     if (snapshot.connectionState == ConnectionState.done) {
-    //        return CircularProgressIndicator();
-    //     }
-    //     else {
-    //       return CircularProgressIndicator();
-    //     }
-    //   }
-    // );
-    // Scaffold.of(__context).
-        
         
         print("result"+result.toString());
       }
@@ -355,7 +309,7 @@ class _ListAircraftState extends State<ListAircraft> {
      
   }
 
-  Future<void> customDialog(String message,BuildContext _context) async {
+  Future<void> customDialog(String message,BuildContext context) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -490,8 +444,8 @@ class _ListAircraftState extends State<ListAircraft> {
   }
 
   void showSnackBar(BuildContext _context,String message){
-    final snackBar = SnackBar(content: Text(message));
-    Scaffold.of(_context).showSnackBar(snackBar);
+    final snackBar = SnackBar(content: Text(message),duration: Duration(seconds: 2 ));
+    Scaffold.of(__context).showSnackBar(snackBar);
   }
 
 
