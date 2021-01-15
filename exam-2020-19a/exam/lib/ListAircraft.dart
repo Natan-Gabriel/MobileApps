@@ -99,31 +99,35 @@ class _ListAircraftState extends State<ListAircraft> {
   }
 
   void sync(BuildContext context) async{
-
-    if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-        setProgressBar();
-        List<Plane> aircrafts_on_db = await db.getAll();
-        List<Plane> aircrafts_on_server = await Server.getAll();
-        print("aircrafts_on_server: "+aircrafts_on_server.toString());
-        for (Plane aircraft in aircrafts_on_db){
-          if (!aircrafts_on_server.contains(aircraft)){
-              db.delete(aircraft.id);
+    try{
+      if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+          setProgressBar();
+          List<Plane> aircrafts_on_db = await db.getAll();
+          List<Plane> aircrafts_on_server = await Server.getAll();
+          print("aircrafts_on_server: "+aircrafts_on_server.toString());
+          for (Plane aircraft in aircrafts_on_db){
+            if (!aircrafts_on_server.contains(aircraft)){
+                db.delete(aircraft.id);
+            }
           }
-        }
 
-        for (Plane aircraft in aircrafts_on_server){
-          if (!aircrafts_on_db.contains(aircraft)){
-              db.add(aircraft);
+          for (Plane aircraft in aircrafts_on_server){
+            if (!aircrafts_on_db.contains(aircraft)){
+                db.add(aircraft);
+            }
           }
-        }
-        setProgressBar();
-        setState(() {
-          _toAdd = [];
-        });
+          setProgressBar();
+          setState(() {
+            _toAdd = [];
+          });
+      }
+
+          
+          _refreshList(context);
     }
-
-        
-        _refreshList(context);
+    catch(exp){
+      showSnackBar(__context, exp.toString());
+    }
   }
 
   void setProgressBar(){
@@ -138,14 +142,19 @@ class _ListAircraftState extends State<ListAircraft> {
   // }
 
   _refreshList(BuildContext context) async {
-    print("_refreshList entered");
-    List<Plane> x = await db.getAll();
-    setState(() {
-      _aircrafts = x;
-    });
-    if(connectivityResult == ConnectivityResult.none){
-      print("connectivityResult == ConnectivityResult.none");
-      showSnackBar(__context,'The server connection is down.Retry using sync button');
+    try{
+      print("_refreshList entered");
+      List<Plane> x = await db.getAll();
+      setState(() {
+        _aircrafts = x;
+      });
+      if(connectivityResult == ConnectivityResult.none){
+        print("connectivityResult == ConnectivityResult.none");
+        showSnackBar(__context,'The server connection is down.Retry using sync button');
+      }
+    }
+    catch(exp){
+      showSnackBar(__context, exp.toString());
     }
   }
 
@@ -243,42 +252,47 @@ class _ListAircraftState extends State<ListAircraft> {
   void _add(BuildContext context) async{
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the AddPage Screen.
-    final Plane aircraft=await Navigator.push(context, MaterialPageRoute(
-                  builder: (context) =>
-                     AddPage()
-                  
-                ));
-    
-    if(aircraft!=null){
-      int result = 0;
-      setProgressBar();
-      db.add(aircraft);
-      setProgressBar();
-        _refreshList(context); 
-      if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+    try{
+      final Plane aircraft=await Navigator.push(context, MaterialPageRoute(
+                    builder: (context) =>
+                      AddPage()
+                    
+                  ));
+      
+      if(aircraft!=null){
+        int result = 0;
         setProgressBar();
-        try{
-          result= await Server.add(aircraft);
-        }
-        catch(exp){
-          print("__context here2 is: "+__context.toString());
-          showSnackBar(__context, exp.toString());
-        }
+        db.add(aircraft);
         setProgressBar();
+          _refreshList(context); 
+        if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+          setProgressBar();
+          try{
+            result= await Server.add(aircraft);
+          }
+          catch(exp){
+            print("__context here2 is: "+__context.toString());
+            showSnackBar(__context, exp.toString());
+          }
+          setProgressBar();
+          
+          print("result"+result.toString());
+        }
+        if(result==200){
+          // db.add(aircraft);
+          // _refreshList(context); 
+          showSnackBar(context,'The item was successfully created !');
+        }
+        else{
+          setState(() => _toAdd.add(aircraft)); 
+          showSnackBar(context,'The item was successfully created !(locally)');
+        }
         
-        print("result"+result.toString());
+        
       }
-      if(result==200){
-        // db.add(aircraft);
-        // _refreshList(context); 
-        showSnackBar(context,'The item was successfully created !');
-      }
-      else{
-        setState(() => _toAdd.add(aircraft)); 
-        showSnackBar(context,'The item was successfully created !(locally)');
-      }
-      
-      
+    }
+    catch(exp){
+      showSnackBar(__context, exp.toString());
     }
     
   }
@@ -286,28 +300,33 @@ class _ListAircraftState extends State<ListAircraft> {
   void _detail(Plane aircraft,BuildContext context) async{
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the AddPage Screen.
-    final Aircraft resultAircraft=await Navigator.push(context, MaterialPageRoute(
-                  builder: (context) =>
-                     DetailPage(aircraft)
-                  
-                ));
-    if(resultAircraft!=null){
-      // setState(() => _aircrafts[_aircrafts.indexOf(aircraft)] = resultAircraft); 
-      int result=0;
-      if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-        result= await Server.update(resultAircraft);
-      }
-      if(result==200){
-        setProgressBar();
-        db.update(resultAircraft);
-        setProgressBar();
-        _refreshList(context); 
-        showSnackBar(context,'The item was successfully updated !');
-      }
-      else{
-        showSnackBar(context,'This operation is not available offline!');
-      }
+    try{
+      final Aircraft resultAircraft=await Navigator.push(context, MaterialPageRoute(
+                    builder: (context) =>
+                      DetailPage(aircraft)
+                    
+                  ));
+      if(resultAircraft!=null){
+        // setState(() => _aircrafts[_aircrafts.indexOf(aircraft)] = resultAircraft); 
+        int result=0;
+        if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+          result= await Server.update(resultAircraft);
+        }
+        if(result==200){
+          setProgressBar();
+          db.update(resultAircraft);
+          setProgressBar();
+          _refreshList(context); 
+          showSnackBar(context,'The item was successfully updated !');
+        }
+        else{
+          showSnackBar(context,'This operation is not available offline!');
+        }
 
+      }
+    }
+    catch(exp){
+      showSnackBar(__context, exp.toString());
     }
     
      
