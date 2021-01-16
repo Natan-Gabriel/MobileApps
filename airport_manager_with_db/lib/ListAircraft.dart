@@ -25,6 +25,8 @@ class _ListAircraftState extends State<ListAircraft> {
 
   var connectivityResult;
 
+  BuildContext __context;
+
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
 
   @override
@@ -34,6 +36,11 @@ class _ListAircraftState extends State<ListAircraft> {
     server =new Server(); 
 
     // getStatus();
+
+    connectivityResult= Connectivity().checkConnectivity();
+    connectivityResult.then((data){
+      connectivityResult=data;
+    });
     
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
     // Got a new connectivity status!
@@ -59,6 +66,10 @@ class _ListAircraftState extends State<ListAircraft> {
   }
 
   void sync() async{
+
+    print("connectivityResult in sync() is: "+connectivityResult.toString());
+        if(connectivityResult == ConnectivityResult.none){
+          showSnackBar(__context,'The server connection is down');
     List<Aircraft> aircrafts_on_db = await db.getAll();
         List<Aircraft> aircrafts_on_server = await Server.getAll();
         print("aircrafts_on_server: "+aircrafts_on_server.toString());
@@ -75,6 +86,9 @@ class _ListAircraftState extends State<ListAircraft> {
         }
 
         
+    }
+
+        
         _refreshList(context);
   }
 
@@ -88,6 +102,7 @@ class _ListAircraftState extends State<ListAircraft> {
     setState(() {
       _aircrafts = x;
     });
+    print("connectivityResult in _refreshList: "+connectivityResult.toString());
     if(connectivityResult == ConnectivityResult.none){
       showSnackBar(context,'The server connection is down');
     }
@@ -107,7 +122,7 @@ class _ListAircraftState extends State<ListAircraft> {
     ),
   ),
       ),
-      body: _buildAircrafts1(),//createTable(),//_buildAircrafts(),//createTable(),  <-if you want the version from previous lab
+      body: Builder(builder: (_context) =>_buildAircrafts1(_context)),//createTable(),//_buildAircrafts(),//createTable(),  <-if you want the version from previous lab
       floatingActionButton: Builder(builder: (context) => FloatingActionButton(
         onPressed : () => _add(context),
         tooltip: 'Increment',
@@ -229,7 +244,9 @@ class _ListAircraftState extends State<ListAircraft> {
     );
 }  
 
-    Widget _buildAircrafts1() {
+    Widget _buildAircrafts1(BuildContext context) {
+      __context=context;
+      //showSnackBar(context,'The server connection is down');
     return ListView.builder(
       padding: const EdgeInsets.only(top:16,left:16,right:16,bottom: 80),
        itemCount: _aircrafts.length*2,
