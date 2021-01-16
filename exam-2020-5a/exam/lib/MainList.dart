@@ -169,9 +169,13 @@ class _MainListState extends State<MainList> {
       if(result==ConnectivityResult.mobile || result==ConnectivityResult.wifi){  
         print("aici");
         setProgressBar();
-        for (Book plane in _toAdd){
-            Server.add(plane);
+        _toAdd=await db.getAllToAdd();
+        for (Book entity in _toAdd){
+            Server.add(entity);
+            db.deleteToAdd(entity.id);
         }
+        
+        
         setProgressBar();
          await sync(context);
 
@@ -200,9 +204,7 @@ class _MainListState extends State<MainList> {
             }
           }
           setProgressBar();
-          setState(() {
-            _toAdd = [];
-          });
+          
       }
 
           
@@ -216,14 +218,7 @@ class _MainListState extends State<MainList> {
 
   _refreshList(BuildContext context) async {
     try{
-      print("_refreshList entered");
-      setProgressBar();
-      List<Book> x = await db.getAllBorrowed();
-      print("x: "+x.toString());
-      setProgressBar();
-      setState(() {
-        _entities = x;
-      });
+      setState(() {});
       if(connectivityResult == ConnectivityResult.none){
         print("connectivityResult == ConnectivityResult.none");
         showSnackBar(__context,'The server connection is down.Retry using sync button');
@@ -313,7 +308,7 @@ class _MainListState extends State<MainList> {
           showSnackBar(context,'The item was successfully created !');
         }
         else{
-          setState(() => _toAdd.add(entity)); 
+          await db.addToAdd(entity);
           showSnackBar(context,'The item was successfully created !(locally)');
         }
         
@@ -444,8 +439,9 @@ class _MainListState extends State<MainList> {
 }  
 
     Widget _buildList(BuildContext _context) {
+    
       __context=_context;
-      ()async {List<Book> _entities = await db.getAllBorrowed();};
+      ()async {setProgressBar(); List<Book> _entities = await db.getAllBorrowed();setProgressBar();};
       //sync(__context);
     return ListView.builder(
       padding: const EdgeInsets.only(top:16,left:16,right:16,bottom: 80),

@@ -23,7 +23,7 @@ import 'package:flutter/widgets.dart';
  
 class Db{
 
-  static const _databaseName = 'bookv3.db';
+  static const _databaseName = 'bookv4.db';
   static const _databaseVersion = 1;
 
   Db._();
@@ -48,6 +48,9 @@ class Db{
     //create tables
     await db.execute(
           "CREATE TABLE borrowed (id INTEGER PRIMARY KEY, title TEXT, status TEXT,student TEXT, pages INTEGER , usedCount INTEGER)"
+        ); 
+    await db.execute(
+          "CREATE TABLE toAdd (id INTEGER PRIMARY KEY, title TEXT, status TEXT,student TEXT, pages INTEGER , usedCount INTEGER)"
         );  
     return await db.execute(
           "CREATE TABLE books(id INTEGER PRIMARY KEY, title TEXT, status TEXT,student TEXT, pages INTEGER , usedCount INTEGER)"
@@ -83,6 +86,35 @@ class Db{
       throw exp;
     }
 }
+
+  Future<void> addToAdd(Book entity) async {
+    // Directory dataDirectory=await getApplicationDocumentsDirectory();
+    // String dbPath = join(dataDirectory.path, _databaseName);
+    // print('db location : '+dbPath);
+    
+    // Get a reference to the database.
+    try{
+      Database db = await database;
+
+      // Insert the Dog into the correct table. You might also specify the
+      // `conflictAlgorithm` to use in case the same dog is inserted twice.
+      //
+      // In this case, replace any previous data.
+      await db.insert(
+        'toAdd',
+        entity.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      developer.log("add of "+entity.toString()+" to the db was successful",name: 'exam.db');
+    }
+    catch(exp){
+      print(exp);
+      developer.log("add of "+entity.toString()+" threw the following error: ",name: 'exam.db',
+        error: exp);
+      throw exp;
+    }
+}
+
 Future<void> addBorrowed(Book entity) async {
     // Directory dataDirectory=await getApplicationDocumentsDirectory();
     // String dbPath = join(dataDirectory.path, _databaseName);
@@ -160,6 +192,29 @@ Future<void> addBorrowed(Book entity) async {
     }
   }
 
+  Future<void> deleteToAdd(int id) async {
+
+    try{
+      Database db = await database;
+
+      // Remove the Dog from the Database.
+      await db.delete(
+        'toAdd',
+        // Use a `where` clause to delete a specific dog.
+        where: "id = ?",
+        // Pass the Dog's id as a whereArg to prevent SQL injection.
+        whereArgs: [id],
+      );
+      developer.log("entity having id "+id.toString()+" was successfully deleted",name: 'exam.db');
+    }
+    catch(exp){
+      print(exp);
+      developer.log("delete of plane with id "+id.toString() + "threw the following error: ",name: 'exam.db',
+        error: exp);
+      throw exp;
+    }
+  }
+
   
 
   Future<void> deleteBorrowed(int id) async {
@@ -193,6 +248,37 @@ Future<void> addBorrowed(Book entity) async {
 
       // Query the table for all The Dogs.
       final List<Map<String, dynamic>> maps = await db.query('books');
+
+      // Convert the List<Map<String, dynamic> into a List<Dog>.
+      List<Book> res=List.generate(maps.length, (i) {
+        return Book(
+          maps[i]['id'],
+          maps[i]['title'],
+          maps[i]['status'],
+          maps[i]['student'],
+          maps[i]['pages'],
+          maps[i]['usedCount']
+        );
+      });
+      developer.log("getAll call to the db was successful",name: 'exam.db');
+      return res;
+    }
+    catch(exp){
+      print(exp);
+      developer.log("getAll threw the following error: ",name: 'exam.db',
+        error: exp);
+      throw(exp);
+    }
+  }
+
+
+  Future<List<Book>> getAllToAdd() async {
+
+    try{
+      final Database db = await database;
+
+      // Query the table for all The Dogs.
+      final List<Map<String, dynamic>> maps = await db.query('toAdd');
 
       // Convert the List<Map<String, dynamic> into a List<Dog>.
       List<Book> res=List.generate(maps.length, (i) {
