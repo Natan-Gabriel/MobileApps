@@ -2,170 +2,26 @@ import 'dart:convert';
 
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'AddWidget.dart';
+import 'crud/AddWidget.dart';
 import 'Reports.dart';
 import 'Borrow.dart';
-import 'SetName.dart';
+import 'crud/DetailWidget.dart';
+import 'crud/SetName.dart';
 import 'domain/Book.dart';
 import 'server/server.dart';
 import 'package:flutter/material.dart';
 import 'database/database.dart';
 import 'dart:developer' as developer;
 import 'package:connectivity/connectivity.dart';
-import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ListAircraft extends StatefulWidget {
+class MainList extends StatefulWidget {
   final channel = IOWebSocketChannel.connect('ws://10.0.2.2:2501');
   @override
-  _ListAircraftState createState() => _ListAircraftState(channel:channel);
+  _MainListState createState() => _MainListState(channel:channel);
 }
 
-class _ListAircraftState extends State<ListAircraft> {
-
-
-  bool _progressBarActive = false;
-  final WebSocketChannel channel;
-
-  _ListAircraftState({this.channel}) {
-    channel.stream.listen((data) {
-      print("Websocket works!!.Data: "+data.toString());
-      Map userMap = jsonDecode(data);
-      var data_decoded = Book.fromMap(userMap);
-      //showSnackBar(__context, "Websocket works!!");
-      String message="Another user just added a book. The book has the title: "+data_decoded.title+", it has: "+data_decoded.status.toString()+" pages and the usedCount is: "+data_decoded.usedCount.toString();
-      //customDialog(message,__context);
-      //initState(() {});
-      sync(__context);
-      print("__context here1 is: "+__context.toString());
-      //customDialog(message,__context);
-      showSnackBar(__context, message);
-    });
-  }
-
-  BuildContext __context;
-
-  Db db; 
-  Server server;//=new Server();
-
-  List<Book> _aircrafts = [];  
-
-  List<Book> _toAdd = [];  
-
-  //final channel = IOWebSocketChannel.connect('ws://echo.websocket.org');
-
-
-  var connectivityResult;
-
-  final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
-
-  @override
-  void initState() {
-    super.initState();
-    db = Db.instance;
-    server =new Server(); 
-
-    sync(__context);
-
-    //_refreshList(context);
-
-   // showSnackBar(__context, message);
-
-    connectivityResult= Connectivity().checkConnectivity();
-
-    connectivityResult.then((data){
-      connectivityResult=data;
-    });
-    // connectivityResult.then((val){print("val: "+val.toString());});
-    
-    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
-    // Got a new connectivity status!
-      print("Connectivity: " + result.toString());
-      connectivityResult=result;
-      if(result==ConnectivityResult.mobile || result==ConnectivityResult.wifi){  
-        print("aici");
-        setProgressBar();
-        for (Book plane in _toAdd){
-            Server.add(plane);
-        }
-        setProgressBar();
-         await sync(context);
-
-      }
-    });
-  
-  }
-
-  void sync(BuildContext context) async{
-    try{
-      if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-          String student=await getRecord();
-          setProgressBar();
-          List<Book> aircrafts_on_db = await db.getAllBorrowed();
-          List<Book> aircrafts_on_server = await Server.getAllBorrowed(student);
-          print("aircrafts_on_server: "+aircrafts_on_server.toString());
-          for (Book aircraft in aircrafts_on_db){
-            if (!aircrafts_on_server.contains(aircraft)){
-                db.deleteBorrowed(aircraft.id);
-            }
-          }
-
-          for (Book aircraft in aircrafts_on_server){
-            if (!aircrafts_on_db.contains(aircraft)){
-                db.addBorrowed(aircraft);
-            }
-          }
-          setProgressBar();
-          setState(() {
-            _toAdd = [];
-          });
-      }
-
-          
-          _refreshList(context);
-    }
-    catch(exp){
-      showSnackBar(__context, exp.toString());
-    }
-  }
-
-  void setProgressBar(){
-    setState(() {
-      _progressBarActive=!_progressBarActive;
-    });
-  }
-
-  _refreshList(BuildContext context) async {
-    try{
-      print("_refreshList entered");
-      setProgressBar();
-      List<Book> x = await db.getAllBorrowed();
-      print("x: "+x.toString());
-      setProgressBar();
-      setState(() {
-        _aircrafts = x;
-      });
-      if(connectivityResult == ConnectivityResult.none){
-        print("connectivityResult == ConnectivityResult.none");
-        showSnackBar(__context,'The server connection is down.Retry using sync button');
-      }
-    }
-    catch(exp){
-      showSnackBar(__context, exp.toString());
-    }
-  }
-
-  void record(String str) async{
-    Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-    final SharedPreferences prefs = await _prefs;
-    prefs.setString('user', str);
-  }
-
-  getRecord() async{
-    Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-    final SharedPreferences prefs = await _prefs;
-    return prefs.getString('user');
-  }
+class _MainListState extends State<MainList> {
 
 
   @override
@@ -196,7 +52,7 @@ class _ListAircraftState extends State<ListAircraft> {
       ),
 
       
-      body: Builder(builder: (_context) => _buildAircrafts1(_context)),//createTable(),//_buildAircrafts(),//createTable(),  <-if you want the version from previous lab
+      body: Builder(builder: (_context) => _buildList(_context)),//createTable(),//_buildAircrafts(),//createTable(),  <-if you want the version from previous lab
       drawer: Drawer(
         child: Builder(builder: (_context) => ListView(
           // Important: Remove any padding from the ListView.
@@ -227,6 +83,7 @@ class _ListAircraftState extends State<ListAircraft> {
                      Borrow()
                   
                 ));
+                
                 }
 
               },
@@ -238,7 +95,7 @@ class _ListAircraftState extends State<ListAircraft> {
                   Navigator.pop(context);
                   showSnackBar(_context, "Please connect to the internet");
                 }
-                else{;
+                else{
                 Navigator.push(context, MaterialPageRoute(
                   builder: (context) =>
                      Reports()
@@ -261,6 +118,140 @@ class _ListAircraftState extends State<ListAircraft> {
 
     );                                      
   }
+
+
+  bool _progressBarActive = false;
+  final WebSocketChannel channel;
+  BuildContext __context;
+  Db db; 
+  Server server;
+  List<Book> _entities = [];  
+  List<Book> _toAdd = []; 
+  var connectivityResult;
+  final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
+ 
+
+  _MainListState({this.channel}) {
+    channel.stream.listen((data) {
+      print("Websocket works!!.Data: "+data.toString());
+      Map userMap = jsonDecode(data);
+      var data_decoded = Book.fromMap(userMap);
+      //showSnackBar(__context, "Websocket works!!");
+      String message="Another user just added a book. The book has the title: "+data_decoded.title+", it has: "+data_decoded.status.toString()+" pages and the usedCount is: "+data_decoded.usedCount.toString();
+      //customDialog(message,__context);
+      //initState(() {});
+      sync(__context);
+      print("__context here1 is: "+__context.toString());
+      //customDialog(message,__context);
+      showSnackBar(__context, message);
+    });
+  }
+
+  
+  @override
+  void initState() {
+    super.initState();
+    db = Db.instance;
+    server =new Server(); 
+
+    sync(__context);
+
+    connectivityResult= Connectivity().checkConnectivity();
+
+    connectivityResult.then((data){
+      connectivityResult=data;
+    });
+
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
+    // Got a new connectivity status!
+      print("Connectivity: " + result.toString());
+      connectivityResult=result;
+      if(result==ConnectivityResult.mobile || result==ConnectivityResult.wifi){  
+        print("aici");
+        setProgressBar();
+        for (Book plane in _toAdd){
+            Server.add(plane);
+        }
+        setProgressBar();
+         await sync(context);
+
+      }
+    });
+  
+  }
+
+  void sync(BuildContext context) async{
+    try{
+      if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+          String student=await getRecord();
+          setProgressBar();
+          List<Book> entities_on_db = await db.getAllBorrowed();
+          List<Book> entities_on_server = await Server.getAllBorrowed(student);
+          print("entities_on_server: "+entities_on_server.toString());
+          for (Book entity in entities_on_db){
+            if (!entities_on_server.contains(entity)){
+                db.deleteBorrowed(entity.id);
+            }
+          }
+
+          for (Book entity in entities_on_server){
+            if (!entities_on_db.contains(entity)){
+                db.addBorrowed(entity);
+            }
+          }
+          setProgressBar();
+          setState(() {
+            _toAdd = [];
+          });
+      }
+
+          
+          _refreshList(context);
+    }
+    catch(exp){
+      showSnackBar(__context, exp.toString());
+    }
+  }
+
+
+  _refreshList(BuildContext context) async {
+    try{
+      print("_refreshList entered");
+      setProgressBar();
+      List<Book> x = await db.getAllBorrowed();
+      print("x: "+x.toString());
+      setProgressBar();
+      setState(() {
+        _entities = x;
+      });
+      if(connectivityResult == ConnectivityResult.none){
+        print("connectivityResult == ConnectivityResult.none");
+        showSnackBar(__context,'The server connection is down.Retry using sync button');
+      }
+    }
+    catch(exp){
+      showSnackBar(__context, exp.toString());
+    }
+  }
+
+  void setProgressBar(){
+    setState(() {
+      _progressBarActive=!_progressBarActive;
+    });
+  }
+
+  void record(String str) async{
+    Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+    final SharedPreferences prefs = await _prefs;
+    prefs.setString('user', str);
+  }
+
+  getRecord() async{
+    Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+    final SharedPreferences prefs = await _prefs;
+    return prefs.getString('user');
+  }
+
 
 
   
@@ -301,7 +292,7 @@ class _ListAircraftState extends State<ListAircraft> {
       if(entity!=null){
         int result = 0;
         setProgressBar();
-        db.add(entity);
+        db.addBorrowed(entity);
         setProgressBar();
           _refreshList(context); 
         if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
@@ -318,8 +309,7 @@ class _ListAircraftState extends State<ListAircraft> {
           print("result"+result.toString());
         }
         if(result==200){
-          // db.add(aircraft);
-          // _refreshList(context); 
+
           showSnackBar(context,'The item was successfully created !');
         }
         else{
@@ -336,40 +326,40 @@ class _ListAircraftState extends State<ListAircraft> {
     
   }
 
-  // void _detail(Plane aircraft,BuildContext context) async{
-  //   // Navigator.push returns a Future that completes after calling
-  //   // Navigator.pop on the AddPage Screen.
-  //   try{
-  //     final Aircraft resultAircraft=await Navigator.push(context, MaterialPageRoute(
-  //                   builder: (context) =>
-  //                     DetailPage(aircraft)
+  void _detail(Book entity,BuildContext context) async{
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the AddPage Screen.
+    try{
+      final Book resultEntity=await Navigator.push(context, MaterialPageRoute(
+                    builder: (context) =>
+                      DetailWidget(entity)
                     
-  //                 ));
-  //     if(resultAircraft!=null){
-  //       // setState(() => _aircrafts[_aircrafts.indexOf(aircraft)] = resultAircraft); 
-  //       int result=0;
-  //       if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-  //         result= await Server.update(resultAircraft);
-  //       }
-  //       if(result==200){
-  //         setProgressBar();
-  //         db.update(resultAircraft);
-  //         setProgressBar();
-  //         _refreshList(context); 
-  //         showSnackBar(context,'The item was successfully updated !');
-  //       }
-  //       else{
-  //         showSnackBar(context,'This operation is not available offline!');
-  //       }
+                  ));
+      if(resultEntity!=null){
+        // setState(() => _entities[_entities.indexOf(aircraft)] = resultAircraft); 
+        int result=0;
+        if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+          result= await Server.update(resultEntity);
+        }
+        if(result==200){
+          setProgressBar();
+          db.update(resultEntity);
+          setProgressBar();
+          _refreshList(context); 
+          showSnackBar(context,'The item was successfully updated !');
+        }
+        else{
+          showSnackBar(context,'This operation is not available offline!');
+        }
 
-  //     }
-  //   }
-  //   catch(exp){
-  //     showSnackBar(__context, exp.toString());
-  //   }
+      }
+    }
+    catch(exp){
+      showSnackBar(__context, exp.toString());
+    }
     
      
-  // }
+  }
 
   Future<void> customDialog(String message,BuildContext context) async {
     return showDialog<void>(
@@ -403,61 +393,63 @@ class _ListAircraftState extends State<ListAircraft> {
     );
 }
 
-//   Future<void> _showMyDialog(Aircraft aircraft,BuildContext _context) async {
-//     return showDialog<void>(
-//       context: context,
-//       barrierDismissible: false, // user must tap button!
-//       builder: (BuildContext context) {
+  Future<void> _showMyDialog(Book entity,BuildContext _context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
         
-//         return AlertDialog(
-//           title: Text('Alert!'),
-//           content: SingleChildScrollView(
-//             child: ListBody(
-//               children: <Widget>[
-//                 Text('Are you sure you want to delete this item?'),
-//               ],
-//             ),
-//           ),
-//           actions: <Widget>[
-//             TextButton(
-//               child: Text('NO',style: new TextStyle(color: Colors.green)),
+        return AlertDialog(
+          title: Text('Alert!'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want to delete this item?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('NO',style: new TextStyle(color: Colors.green)),
               
-//               onPressed: () {
-//                 Navigator.of(context).pop();
-//               },
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             
               
-//             ),
-//             TextButton(
-//               child: Text('YES',style: new TextStyle(color: Colors.green)),
-//               onPressed: () async {
-//                 Navigator.of(context).pop();
-//                 // setState(() => _aircrafts.remove(aircraft));
-//                 int result=0;
-//                 if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-//                   result = await Server.delete(aircraft.tailNumber);
-//                 }
-//                 if(result==200){
-//                   //db.delete(aircraft.id);
-//                   _refreshList(_context);
-//                   showSnackBar(_context, 'The item was successfully deleted !'); 
-//                 }
-//                 else{
-//                   showSnackBar(_context, 'This operation is not available offline!');
-//                 }
-//               },
-//             ),
-//           ],
-//         );
-//       },
-//     );
-// }  
+            ),
+            TextButton(
+              child: Text('YES',style: new TextStyle(color: Colors.green)),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                // setState(() => _entities.remove(aircraft));
+                int result=0;
+                if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+                  result = await Server.delete(entity.id);
+                }
+                if(result==200){
+                  //db.delete(aircraft.id);
+                  _refreshList(_context);
+                  showSnackBar(_context, 'The operation was successfully !'); 
+                }
+                else{
+                  showSnackBar(_context, 'This operation is not available offline!');
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+}  
 
-    Widget _buildAircrafts1(BuildContext _context) {
+    Widget _buildList(BuildContext _context) {
       __context=_context;
+      ()async {List<Book> _entities = await db.getAllBorrowed();};
+      //sync(__context);
     return ListView.builder(
       padding: const EdgeInsets.only(top:16,left:16,right:16,bottom: 80),
-       itemCount: _aircrafts.length*2,
+       itemCount: _entities.length*2,
       // The itemBuilder callback is called once per suggested 
       // word pairing, and places each suggestion into a ListTile
       // row. For even rows, the function adds a ListTile row for
@@ -473,12 +465,12 @@ class _ListAircraftState extends State<ListAircraft> {
         // The syntax "i ~/ 2" divides i by 2 and returns an 
         // integer result.
         final int index = i ~/ 2;
-        return _buildRow1(_aircrafts[index], _context);
+        return _buildRow(_entities[index], _context);
       }
     );
   }
 
-  Widget _buildRow1(Book entity,BuildContext context) {
+  Widget _buildRow(Book entity,BuildContext context) {
 
     return ListTile(
       title: Text(

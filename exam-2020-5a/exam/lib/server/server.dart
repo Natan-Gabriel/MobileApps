@@ -75,27 +75,27 @@ class Server{
     }
 
 
-  // static Future<int> update(Book entity) async {
-  //   // print("aircraft: "+aircraft.toString());
-  //   try{
-  //   final http.Response response = await http.put(
-  //     new Uri.http(url, "/aircraft"+"/"+ entity.id),
-  //     // headers: <String, String>{
-  //     //   'Content-Type': 'application/json; charset=UTF-8',
-  //     // },
-  //     body:  entity.toMap()
-  //   );
-  //   developer.log("update to "+entity.toString()+" returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
-  //   return response.statusCode;
-  //   } 
-  //   catch(exp) {
-  //     print(exp);
-  //     developer.log("update to " + entity.toString()+" threw the following error: ",name: 'exam.server',
-  //       error: exp);
-  //     throw exp;
+  static Future<int> update(Book entity) async {
+    // print("aircraft: "+aircraft.toString());
+    try{
+    final http.Response response = await http.put(
+      new Uri.http(url, "/aircraft"+"/"+ entity.id.toString()),
+      headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      body:  json.encode(entity.toMap())
+    );
+    developer.log("update to "+entity.toString()+" returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
+    return response.statusCode;
+    } 
+    catch(exp) {
+      print(exp);
+      developer.log("update to " + entity.toString()+" threw the following error: ",name: 'exam.server',
+        error: exp);
+      throw exp;
 
-  // }
-  // }
+  }
+  }
 
   static Future<int> delete(int id) async {
     // print("aircraft: "+aircraft.toString());

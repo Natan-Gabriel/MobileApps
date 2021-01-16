@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'domain/Book.dart';
+import '../domain/Book.dart';
 
 
 class AddWidget extends StatelessWidget {
@@ -37,7 +37,6 @@ class AddWidget extends StatelessWidget {
                   ),
                   
                   Padding(padding:new EdgeInsets.only(top: 10),child:Text("Title",style:  _biggerFont) ),
-                  // Text("Aircraft type",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
                       controller: titleController,          
@@ -45,7 +44,6 @@ class AddWidget extends StatelessWidget {
                   ),
 
                   Padding(padding:new EdgeInsets.only(top: 10),child:Text("Status",style:  _biggerFont) ),
-                  // Text("Airline",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
                       controller: statusController,          

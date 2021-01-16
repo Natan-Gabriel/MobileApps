@@ -3,14 +3,14 @@
 
 import 'dart:convert';
 
-import 'package:airport_manager/ListAircraft.dart';
+import 'package:airport_manager/MainList.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'Reports.dart';
-import 'SetName.dart';
+import 'crud/SetName.dart';
 import 'domain/Book.dart';
 import 'server/server.dart';
-import 'BorrowBook.dart';
+import 'crud/BorrowWidget.dart';
 import 'package:flutter/material.dart';
 import 'database/database.dart';
 import 'dart:developer' as developer;
@@ -65,7 +65,7 @@ class _BorrowState extends State<Borrow> {
   @override
   void initState() {
     super.initState();
-    db = Db.instance;
+    //db = Db.instance;
     server =new Server(); 
 
     sync(__context);
@@ -167,7 +167,7 @@ class _BorrowState extends State<Borrow> {
 
     return Scaffold (                    
       appBar: AppBar(
-        title: Text('Registration'),
+        title: Text('Borrow'),
         bottom: PreferredSize(
                   preferredSize: Size(double.infinity, 1.0),
                   child: _progressBarActive == true?const LinearProgressIndicator(
@@ -203,7 +203,7 @@ class _BorrowState extends State<Borrow> {
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(
                   builder: (context) =>
-                     ListAircraft()
+                     new MainList()
                   
                 ));
                 
@@ -212,7 +212,18 @@ class _BorrowState extends State<Borrow> {
             ListTile(
               title: Text('Borrow section'),
               onTap: () {
-                Navigator.pop(context);
+                if(connectivityResult!=ConnectivityResult.mobile && connectivityResult!=ConnectivityResult.wifi){
+                  Navigator.pop(context);
+                  showSnackBar(_context, "Please connect to the internet");
+                }
+                else{
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) =>
+                     Borrow()
+                  
+                ));
+                }
+               
 
               },
             ),
@@ -270,43 +281,7 @@ class _BorrowState extends State<Borrow> {
     
   }
   
-  
-  
 
-  // void _detail(Plane aircraft,BuildContext context) async{
-  //   // Navigator.push returns a Future that completes after calling
-  //   // Navigator.pop on the AddPage Screen.
-  //   try{
-  //     final Aircraft resultAircraft=await Navigator.push(context, MaterialPageRoute(
-  //                   builder: (context) =>
-  //                     DetailPage(aircraft)
-                    
-  //                 ));
-  //     if(resultAircraft!=null){
-  //       // setState(() => _aircrafts[_aircrafts.indexOf(aircraft)] = resultAircraft); 
-  //       int result=0;
-  //       if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-  //         result= await Server.update(resultAircraft);
-  //       }
-  //       if(result==200){
-  //         setProgressBar();
-  //         db.update(resultAircraft);
-  //         setProgressBar();
-  //         _refreshList(context); 
-  //         showSnackBar(context,'The item was successfully updated !');
-  //       }
-  //       else{
-  //         showSnackBar(context,'This operation is not available offline!');
-  //       }
-
-  //     }
-  //   }
-  //   catch(exp){
-  //     showSnackBar(__context, exp.toString());
-  //   }
-    
-     
-  // }
 
   Future<void> customDialog(String message,BuildContext context) async {
     return showDialog<void>(
@@ -378,7 +353,7 @@ class _BorrowState extends State<Borrow> {
                 if(result==200){
                   //db.delete(aircraft.id);
                   _refreshList(_context);
-                  showSnackBar(_context, 'The item was successfully deleted !'); 
+                  showSnackBar(_context, 'The operation was successfully !'); 
                 }
                 else{
                   showSnackBar(_context, 'This operation is not available offline!');

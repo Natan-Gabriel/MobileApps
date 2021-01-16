@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'UpdateWidget.dart';
-import 'domain/Book.dart';
+import '../domain/Book.dart';
 
 class DetailWidget extends StatelessWidget {
 

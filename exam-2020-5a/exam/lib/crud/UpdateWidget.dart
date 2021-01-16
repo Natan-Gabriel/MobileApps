@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
-import 'domain/Book.dart';
+import '../domain/Book.dart';
 
 
 class UpdateWidget extends StatefulWidget {
@@ -17,7 +17,7 @@ class _UpdateWidgetState extends State<UpdateWidget> {
 
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
 
-  // TextEditingController idController ;//= TextEditingController(text: widget._aircraft.flightCode);
+  // TextEditingController idController ;
   TextEditingController titleController;// = TextEditingController();
   TextEditingController statusController;// = TextEditingController();
   TextEditingController studentController;// = TextEditingController();
@@ -42,7 +42,6 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                   Text("id: "+widget._entity.id.toString(),style:  _biggerFont) ,
 
                   Padding(padding:new EdgeInsets.only(top: 10),child:Text("Title",style:  _biggerFont) ),
-                  // Text("Aircraft type",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
                       controller: titleController=TextEditingController(text: widget._entity.title),          
@@ -52,7 +51,6 @@ class _UpdateWidgetState extends State<UpdateWidget> {
 
                   
                   Padding(padding:new EdgeInsets.only(top: 10),child:Text("Status",style:  _biggerFont) ),
-                  // Text("Airline",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
                       controller: statusController=TextEditingController(text: widget._entity.status),       
@@ -60,7 +58,6 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                   ),
 
                   Padding(padding:new EdgeInsets.only(top: 10),child:Text("Student",style:  _biggerFont) ),
-                  // Text("Flight code",style:  _biggerFont) ,
                   
                   Flexible(
                     child:  TextField(
@@ -69,7 +66,6 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                   ),
 
                   Padding(padding:new EdgeInsets.only(top: 10),child:Text("Pages",style:  _biggerFont) ),
-                  // Text("Terminal",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
                       controller: pagesController=TextEditingController(text: widget._entity.pages.toString()),          
@@ -77,7 +73,6 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                   ),
 
                   Padding(padding:new EdgeInsets.only(top: 10),child:Text("usedCount",style:  _biggerFont) ),
-                  // Text("Gate",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
                       controller: usedCountController=TextEditingController(text: widget._entity.usedCount.toString()),          

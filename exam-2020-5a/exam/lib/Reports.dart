@@ -4,13 +4,13 @@
 
 
 import 'dart:convert';
-
+import 'MainList.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import 'AddWidget.dart';
+import 'crud/AddWidget.dart';
 import 'Borrow.dart';
-import 'SetName.dart';
+import 'crud/SetName.dart';
 import 'domain/Book.dart';
 import 'server/server.dart';
 import 'package:flutter/material.dart';
@@ -204,7 +204,11 @@ class _ReportsState extends State<Reports> {
             ListTile(
               title: Text('Owner section'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) =>
+                     MainList()
+                  
+                ));
               },
             ),
             ListTile(

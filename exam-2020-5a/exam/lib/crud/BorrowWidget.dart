@@ -2,10 +2,10 @@
 
 
 import 'package:flutter/material.dart';
-import 'domain/Book.dart';
+import '../domain/Book.dart';
 
 
-class BorrowBookWidget extends StatelessWidget {
+class BorrowWidget extends StatelessWidget {
 
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
 
@@ -19,7 +19,7 @@ class BorrowBookWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold (                    
       appBar: AppBar(
-        title: Text('set name'),
+        title: Text('Borrow book'),
       ),
       body: new Padding(
             padding: const EdgeInsets.all(30.0),
@@ -50,14 +50,9 @@ class BorrowBookWidget extends StatelessWidget {
 
                   FlatButton(
                     onPressed: () {
-                      // setState(() => widget._aircrafts.add(Aircraft(tailNumberController.text,aircraftTypeController.text,airlineController.text,flightCodeController.text,terminalController.text,gateController.text))); 
                       List<String> l=[idController.text,studentController.text];
-                      // widget._aircrafts.add(aircraft); 
-                      // widget.notifyParent();
                       Navigator.pop(context,l);
-                                  
-                    
-                      //Navigator.pop(context);//
+                        
                     },
                     child: Text(
                       "Borrow",),
