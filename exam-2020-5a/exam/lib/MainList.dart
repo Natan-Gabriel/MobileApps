@@ -18,10 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:after_layout/after_layout.dart';
 
 class MainList extends StatefulWidget {
-  final channel = IOWebSocketChannel.connect('ws://10.0.2.2:2501');
-  StreamController<String> streamController = new StreamController.broadcast(); 
   @override
-  // _MainListState createState() => _MainListState(channel:channel);
   _MainListState createState() => _MainListState();
 }
 
@@ -125,16 +122,12 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
 
   @override
   void afterFirstLayout(BuildContext context){
-    print("afterFirstLayout");
-    // Calling the same function "after layout" to resolve the issue.
     _refreshList(context);
-    print("afterFirstLayout finished");
   }
 
 
   bool _progressBarActive = false;
-  // final WebSocketChannel channel;
-  IOWebSocketChannel channel;// = IOWebSocketChannel.connect('ws://10.0.2.2:2501');
+  IOWebSocketChannel channel;
   BuildContext __context;
   Db db; 
   Server server;
@@ -142,10 +135,6 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
   List<Book> _toAdd = []; 
   var connectivityResult;
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
- 
-
- // _MainListState({this.channel}){websocket();}
- //_MainListState(){websocket();}
 
   void websocket(){
     channel.stream.listen((data) {
@@ -202,10 +191,6 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
         await sync(context);
 
       }
-      // else{
-      //   channel.sink.close();
-      //   super.dispose();
-      // }
     });
   
   }
@@ -305,12 +290,7 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
           record(str);
         }
       sync(__context);
-        
-        
-        
-      
-    
-    
+  
   }
   
   
@@ -353,7 +333,7 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
         }
         else{
           await db.addToAdd(entity);
-          showSnackBar(context,'The item was successfully created !(locally)');
+          //showSnackBar(context,'The item was successfully created !(locally)');
         }
         
         

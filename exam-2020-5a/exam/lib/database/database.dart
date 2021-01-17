@@ -270,7 +270,7 @@ Future<void> addBorrowed(Book entity,{int online=0}) async {
           maps[i]['usedCount']
         );
       });
-      developer.log("getAll call to the db was successful",name: 'exam.db');
+      developer.log("getAll call to the db was successful and returned: "+res.toString(),name: 'exam.db');
       return res;
     }
     catch(exp){

@@ -38,12 +38,12 @@ class Server{
     //   "manufacturer": "93",
     //   "capacity": 93,
     );
-    developer.log("add of "+entity.toString()+" to the server returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
+    developer.log("add: add of "+entity.toString()+" to the server returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
     return response.statusCode;
     }
     catch(exp){
       print(exp);
-      developer.log("add of "+entity.toString()+" threw the following error: ",name: 'exam.server',
+      developer.log("add: add of "+entity.toString()+" threw the following error: ",name: 'exam.server',
         error: exp);
       throw exp;
     }
@@ -85,12 +85,12 @@ class Server{
         },
       body:  json.encode(entity.toMap())
     );
-    developer.log("update to "+entity.toString()+" returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
+    developer.log("update: update to "+entity.toString()+" returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
     return response.statusCode;
     } 
     catch(exp) {
       print(exp);
-      developer.log("update to " + entity.toString()+" threw the following error: ",name: 'exam.server',
+      developer.log("update: update to " + entity.toString()+" threw the following error: ",name: 'exam.server',
         error: exp);
       throw exp;
 
@@ -103,12 +103,12 @@ class Server{
     final http.Response response = await http.delete(
       new Uri.http(url, "/plane"+"/"+ id.toString())
     );
-    developer.log("delete of entity with id "+id.toString()+" returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
+    developer.log("delete: delete of entity with id "+id.toString()+" returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
     return response.statusCode;
     }
     catch(exp){
       print(exp);
-      developer.log("delete of plane with id "+id.toString() + "threw the following error: ",name: 'exam.server',
+      developer.log("delete: delete of plane with id "+id.toString() + "threw the following error: ",name: 'exam.server',
         error: exp);
       throw exp;
     }
@@ -129,12 +129,12 @@ class Server{
           entities.add(Book(aircraft['id'], aircraft['title'], aircraft['status'], aircraft['student'], aircraft['pages'], aircraft['usedCount']));
       }
       //entities.sort((a, b) => a.size.compareTo(b.size));
-      developer.log("getAll returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
+      developer.log("getAll: getAll returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
       return entities;
       }
     } catch(exp) {
         print(exp);
-        developer.log("getAll threw the following error: ",name: 'exam.server',
+        developer.log("getAll: getAll threw the following error: ",name: 'exam.server',
           error: exp);
         throw(exp);
     }
