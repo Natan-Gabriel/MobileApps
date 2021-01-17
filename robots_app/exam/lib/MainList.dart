@@ -4,8 +4,6 @@ import 'dart:convert';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'crud/AddWidget.dart';
-import 'Reports.dart';
-import 'Borrow.dart';
 import 'crud/DetailWidget.dart';
 import 'crud/SetName.dart';
 import 'domain/Book.dart';
@@ -79,11 +77,11 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
                   showSnackBar(_context, "Please connect to the internet");
                 }
                 else{
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) =>
-                     Borrow()
+                // Navigator.push(context, MaterialPageRoute(
+                //   builder: (context) =>
+                //      Borrow()
                   
-                ));
+                // ));
                 
                 }
 
@@ -97,11 +95,11 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
                   showSnackBar(_context, "Please connect to the internet");
                 }
                 else{
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) =>
-                     Reports()
+                // Navigator.push(context, MaterialPageRoute(
+                //   builder: (context) =>
+                //      Reports()
                   
-                ));
+                // ));
                 }
               },
             ),
@@ -111,7 +109,7 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
       ),
       
       floatingActionButton: Builder(builder: (context) => FloatingActionButton(
-        onPressed : () => _add(context),
+        //onPressed : () => _add(context),
         tooltip: 'Increment',
         child: const Icon(Icons.add),backgroundColor: Colors.green,
       )
@@ -131,8 +129,8 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
   BuildContext __context;
   Db db; 
   Server server;
-  List<Book> _entities = [];  
-  List<Book> _toAdd = []; 
+  List<String> _entities = [];  
+  // List<Book> _toAdd = []; 
   var connectivityResult;
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
 
@@ -176,15 +174,11 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
       print("Connectivity: " + result.toString());
       connectivityResult=result;
       if(result==ConnectivityResult.mobile || result==ConnectivityResult.wifi){  
-        channel = IOWebSocketChannel.connect('ws://10.0.2.2:2501');
+        channel = IOWebSocketChannel.connect('ws://10.0.2.2:2202');
         websocket(); //start websocket
         print("aici");
         setProgressBar();
-        _toAdd=await db.getAllToAdd();
-        for (Book entity in _toAdd){
-            Server.add(entity);
-            await db.deleteToAdd(entity.id);
-        }
+        
         
         
         setProgressBar();
@@ -204,19 +198,19 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
           String student=await getRecord();
           print("student: "+student);
           setProgressBar();
-          List<Book> entities_on_db = await db.getAllBorrowed();
-          List<Book> entities_on_server = await Server.getAllBorrowed(student);
+          List<String> entities_on_db = await db.getTypes();
+          List<String> entities_on_server = await Server.getTypes();
           print("entities_on_server: "+entities_on_server.toString());
           print("entities_on_db: "+entities_on_db.toString());
-          for (Book entity in entities_on_db){
+          for (String entity in entities_on_db){
             if (!entities_on_server.contains(entity)){
-                await db.deleteBorrowed(entity.id);
+                await db.deleteType(entity);
             }
           }
 
-          for (Book entity in entities_on_server){
+          for (String entity in entities_on_server){
             if (!entities_on_db.contains(entity)){
-                await db.addBorrowed(entity,online: 1);
+                await db.addType(entity);
             }
           }
           setProgressBar();
@@ -237,7 +231,7 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
   _refreshList(BuildContext context) async {
     try{
       setProgressBar();
-      List<Book> l=await db.getAllBorrowed();
+      List<String> l=await db.getTypes();
       setProgressBar();
       setState(() {
         _entities = l;
@@ -294,58 +288,58 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
   }
   
   
-  void _add(BuildContext context) async{
-    // Navigator.push returns a Future that completes after calling
-    // Navigator.pop on the AddPage Screen.
-    try{
-      final Book entity=await Navigator.push(context, MaterialPageRoute(
-                    builder: (context) =>
-                      AddWidget()
+  // void _add(BuildContext context) async{
+  //   // Navigator.push returns a Future that completes after calling
+  //   // Navigator.pop on the AddPage Screen.
+  //   try{
+  //     final Book entity=await Navigator.push(context, MaterialPageRoute(
+  //                   builder: (context) =>
+  //                     AddWidget()
                     
-                  ));
+  //                 ));
     
       
-      if(entity!=null){
-        String student=await getRecord();
-        entity.setStudent(student);
-        int result = 0;
-        setProgressBar();
-        await db.addBorrowed(entity);
-        setProgressBar();
-        //_refreshList(context); 
-        if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-          setProgressBar();
-          try{
-            result= await Server.add(entity);
-          }
-          catch(exp){
-            print("__context here2 is: "+__context.toString());
-            showSnackBar(__context, exp.toString());
-          }
-          setProgressBar();
+  //     if(entity!=null){
+  //       String student=await getRecord();
+  //       entity.setStudent(student);
+  //       int result = 0;
+  //       setProgressBar();
+  //       await db.addBorrowed(entity);
+  //       setProgressBar();
+  //       //_refreshList(context); 
+  //       if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+  //         setProgressBar();
+  //         try{
+  //           result= await Server.add(entity);
+  //         }
+  //         catch(exp){
+  //           print("__context here2 is: "+__context.toString());
+  //           showSnackBar(__context, exp.toString());
+  //         }
+  //         setProgressBar();
           
-          print("result"+result.toString());
-        }
-        // sync(context);
-        if(result==200){
+  //         print("result"+result.toString());
+  //       }
+  //       // sync(context);
+  //       if(result==200){
 
-          showSnackBar(context,'The item was successfully created !');
-        }
-        else if(result!=404){
-          await db.addToAdd(entity);
-          //showSnackBar(context,'The item was successfully created !(locally)');
-        }
+  //         showSnackBar(context,'The item was successfully created !');
+  //       }
+  //       else if(result!=404){
+  //         await db.addToAdd(entity);
+  //         //showSnackBar(context,'The item was successfully created !(locally)');
+  //       }
 
-        sync(context);
+  //       sync(context);
         
         
-      }
-    }
-    catch(exp){
-      showSnackBar(__context, exp.toString());
-    }
+  //     }
+  //   }
+  //   catch(exp){
+  //     showSnackBar(__context, exp.toString());
+  //   }
     
-  }
+  // }
 
   void _detail(Book entity,BuildContext context) async{
     // Navigator.push returns a Future that completes after calling
@@ -495,11 +489,11 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
     );
   }
 
-  Widget _buildRow(Book entity,BuildContext context) {
+  Widget _buildRow(String entity,BuildContext context) {
 
     return ListTile(
       title: Text(
-        "id: "+entity.id.toString()+"\n",
+        "type: "+entity+"\n",
         
         style: _biggerFont,
       ),

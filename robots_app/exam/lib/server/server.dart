@@ -14,7 +14,7 @@ import 'dart:convert';
 
 class Server{
 
-  static const String url='10.0.2.2:2501';
+  static const String url='10.0.2.2:2202';
   
   static Server _instance;
   factory Server() => _instance ??= new Server._();
@@ -135,6 +135,31 @@ class Server{
     } catch(exp) {
         print(exp);
         developer.log("getAll: getAll threw the following error: ",name: 'exam.server',
+          error: exp);
+        throw(exp);
+    }
+  }
+
+  static Future<List<String>> getTypes() async {
+    try{
+      final response = await http.get(new Uri.http(url, '/types'));
+      List<String> entities = List<String>();
+
+      if (response.statusCode == 200) {
+        // If the server did return a 200 OK response,
+        // then parse the JSON.
+        for(String aircraft in jsonDecode(response.body)){
+          print(aircraft);
+          //aircrafts.add(Plane.fromMap(aircraft));
+          entities.add(aircraft);
+      }
+      //entities.sort((a, b) => a.size.compareTo(b.size));
+      developer.log("getTypes: getTypes returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
+      return entities;
+      }
+    } catch(exp) {
+        print(exp);
+        developer.log("getTypes: getTypes threw the following error: ",name: 'exam.server',
           error: exp);
         throw(exp);
     }

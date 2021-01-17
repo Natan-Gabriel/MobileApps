@@ -23,7 +23,7 @@ import 'package:flutter/widgets.dart';
  
 class Db{
 
-  static const _databaseName = 'bookv4.db';
+  static const _databaseName = 'robotv1.db';
   static const _databaseVersion = 1;
   
 
@@ -48,13 +48,13 @@ class Db{
   Future _onCreateDB(Database db, int version) async {
     //create tables
     await db.execute(
-          "CREATE TABLE borrowed (id INTEGER PRIMARY KEY, title TEXT, status TEXT,student TEXT, pages INTEGER , usedCount INTEGER)"
+          "CREATE TABLE types (type TEXT)"
         ); 
-    await db.execute(
-          "CREATE TABLE toAdd (id INTEGER PRIMARY KEY, title TEXT, status TEXT,student TEXT, pages INTEGER , usedCount INTEGER)"
-        );  
+    // await db.execute(
+    //       "CREATE TABLE toAdd (id INTEGER PRIMARY KEY, title TEXT, status TEXT,student TEXT, pages INTEGER , usedCount INTEGER)"
+    //     );  
     return await db.execute(
-          "CREATE TABLE books(id INTEGER PRIMARY KEY, title TEXT, status TEXT,student TEXT, pages INTEGER , usedCount INTEGER)"
+          "CREATE TABLE robots(id INTEGER PRIMARY KEY, name TEXT, specs TEXT,height INTEGER, type TEXT , age INTEGER)"
         );  
   }
 
@@ -88,70 +88,28 @@ class Db{
     }
 }
 
-  Future<void> addToAdd(Book entity) async {
-    // Directory dataDirectory=await getApplicationDocumentsDirectory();
-    // String dbPath = join(dataDirectory.path, _databaseName);
-    // print('db location : '+dbPath);
-    
-    // Get a reference to the database.
+  Future<void> addType(String type) async {
     try{
       Database db = await database;
 
-      // Insert the Dog into the correct table. You might also specify the
-      // `conflictAlgorithm` to use in case the same dog is inserted twice.
-      //
-      // In this case, replace any previous data.
       await db.insert(
-        'toAdd',
-        entity.toLocalMap(),
+        'types',
+        {
+          "type":type
+        },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-      developer.log("addToAdd: add of "+entity.toString()+" to the db was successful",name: 'exam.db');
+      developer.log("addToAdd: add of "+type.toString()+" to the db was successful",name: 'exam.db');
     }
     catch(exp){
       print(exp);
-      developer.log("addToAdd: add of "+entity.toString()+" threw the following error: ",name: 'exam.db',
+      developer.log("addToAdd: add of "+type.toString()+" threw the following error: ",name: 'exam.db',
         error: exp);
       throw exp;
     }
 }
 
-Future<void> addBorrowed(Book entity,{int online=0}) async {
-    // Directory dataDirectory=await getApplicationDocumentsDirectory();
-    // String dbPath = join(dataDirectory.path, _databaseName);
-    // print('db location : '+dbPath);
-    
-    // Get a reference to the database.
-    try{
-      Database db = await database;
 
-      // Insert the Dog into the correct table. You might also specify the
-      // `conflictAlgorithm` to use in case the same dog is inserted twice.
-      //
-      // In this case, replace any previous data.
-      if(online==0){
-        await db.insert(
-          'borrowed',
-          entity.toLocalMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      }
-      else{
-        await db.insert(
-          'borrowed',
-          entity.toMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      }
-      developer.log("addBorrowed: add of "+entity.toString()+" to the db was successful",name: 'exam.db');
-    }
-    catch(exp){
-      print(exp);
-      developer.log("addBorrowed: add of "+entity.toString()+" threw the following error: ",name: 'exam.db',
-        error: exp);
-      throw exp;
-    }
-}
 
   
   Future<void> update(Book entity) async {
@@ -202,24 +160,24 @@ Future<void> addBorrowed(Book entity,{int online=0}) async {
     }
   }
 
-  Future<void> deleteToAdd(int id) async {
+  Future<void> deleteType(String type) async {
 
     try{
       Database db = await database;
 
       // Remove the Dog from the Database.
       await db.delete(
-        'toAdd',
+        'types',
         // Use a `where` clause to delete a specific dog.
-        where: "id = ?",
+        where: "type = ?",
         // Pass the Dog's id as a whereArg to prevent SQL injection.
-        whereArgs: [id],
+        whereArgs: [type],
       );
-      developer.log("deleteToAdd: entity having id "+id.toString()+" was successfully deleted",name: 'exam.db');
+      developer.log("deleteType: entity having type "+type.toString()+" was successfully deleted",name: 'exam.db');
     }
     catch(exp){
       print(exp);
-      developer.log("deleteToAdd: delete of plane with id "+id.toString() + "threw the following error: ",name: 'exam.db',
+      developer.log("deleteType: delete of entity with type "+type.toString() + "threw the following error: ",name: 'exam.db',
         error: exp);
       throw exp;
     }
@@ -227,30 +185,32 @@ Future<void> addBorrowed(Book entity,{int online=0}) async {
 
   
 
-  Future<void> deleteBorrowed(int id) async {
+ 
+
+  // A method that retrieves all the dogs from the dogs table.
+  Future<List<String>> getTypes() async {
 
     try{
-      Database db = await database;
+      final Database db = await database;
 
-      // Remove the Dog from the Database.
-      await db.delete(
-        'borrowed',
-        // Use a `where` clause to delete a specific dog.
-        where: "id = ?",
-        // Pass the Dog's id as a whereArg to prevent SQL injection.
-        whereArgs: [id],
-      );
-      developer.log("entity having id "+id.toString()+" was successfully deleted(deleteBorrowed)",name: 'exam.db');
+      // Query the table for all The Dogs.
+      final List<Map<String, dynamic>> maps = await db.query('types');
+
+      // Convert the List<Map<String, dynamic> into a List<Dog>.
+      List<String> res=List.generate(maps.length, (i) {
+        return maps[i]['type'];
+      });
+      developer.log("getTypes call to the db was successful and returned: "+res.toString(),name: 'exam.db');
+      return res;
     }
     catch(exp){
       print(exp);
-      developer.log("deleteBorrowed plane with id "+id.toString() + "threw the following error: ",name: 'exam.db',
+      developer.log("getTypes threw the following error: ",name: 'exam.db',
         error: exp);
-      throw exp;
+      throw(exp);
     }
   }
 
-  // A method that retrieves all the dogs from the dogs table.
   Future<List<Book>> getAll() async {
 
     try{
@@ -313,36 +273,5 @@ Future<void> addBorrowed(Book entity,{int online=0}) async {
     }
   }
 
-  
-
-  Future<List<Book>> getAllBorrowed() async {
-
-    try{
-      final Database db = await database;
-
-      // Query the table for all The Dogs.
-      final List<Map<String, dynamic>> maps = await db.query('borrowed');
-
-      // Convert the List<Map<String, dynamic> into a List<Dog>.
-      List<Book> res=List.generate(maps.length, (i) {
-        return Book(
-          maps[i]['id'],
-          maps[i]['title'],
-          maps[i]['status'],
-          maps[i]['student'],
-          maps[i]['pages'],
-          maps[i]['usedCount']
-        );
-      });
-      developer.log("getAllBorrowed call to the db was successful",name: 'exam.db');
-      return res;
-    }
-    catch(exp){
-      print(exp);
-      developer.log("getAllBorrowed threw the following error: ",name: 'exam.db',
-        error: exp);
-      throw(exp);
-    }
-  }
 
 }
