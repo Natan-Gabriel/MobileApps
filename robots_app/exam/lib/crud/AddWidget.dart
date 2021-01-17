@@ -1,3 +1,4 @@
+import 'package:airport_manager/domain/Robot.dart';
 import 'package:flutter/material.dart';
 import '../domain/Book.dart';
 
@@ -7,11 +8,12 @@ class AddWidget extends StatelessWidget {
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
 
   final idController = TextEditingController();
-  final titleController = TextEditingController();
-  final statusController = TextEditingController();
+  final nameController = TextEditingController();
+  final specsController = TextEditingController();
 
-  final pagesController = TextEditingController();
-  final usedCountController = TextEditingController();
+  final heightController = TextEditingController();
+  final typeController = TextEditingController();
+  final ageController = TextEditingController();
 
 
 
@@ -36,32 +38,40 @@ class AddWidget extends StatelessWidget {
                   //   ),
                   // ),
                   
-                  Padding(padding:new EdgeInsets.only(top: 10),child:Text("Title",style:  _biggerFont) ),
+                  Padding(padding:new EdgeInsets.only(top: 10),child:Text("Name",style:  _biggerFont) ),
                   Flexible(
                     child:  TextField(
-                      controller: titleController,          
+                      controller: nameController,          
                     ),
                   ),
 
-                  // Padding(padding:new EdgeInsets.only(top: 10),child:Text("Status",style:  _biggerFont) ),
-                  // Flexible(
-                  //   child:  TextField(
-                  //     controller: statusController,          
-                  //   ),
-                  // ),
-
-                  Text("pages",style:  _biggerFont) ,
+                  Padding(padding:new EdgeInsets.only(top: 10),child:Text("Specs",style:  _biggerFont) ),
                   Flexible(
                     child:  TextField(
-                      controller: pagesController,          
+                      controller: specsController,          
                     ),
                   ),
 
-                  Padding(padding:new EdgeInsets.only(top: 10),child:Text("used Count",style:  _biggerFont) ),
+                  Text("Height",style:  _biggerFont) ,
+                  Flexible(
+                    child:  TextField(
+                      controller: heightController,          
+                    ),
+                  ),
+
+                  Padding(padding:new EdgeInsets.only(top: 10),child:Text("Type",style:  _biggerFont) ),
                   // Text("Terminal",style:  _biggerFont) ,
                   Flexible(
                     child:  TextField(
-                      controller: usedCountController,          
+                      controller: typeController,          
+                    ),
+                  ),
+
+                  Padding(padding:new EdgeInsets.only(top: 10),child:Text("Age",style:  _biggerFont) ),
+                  // Text("Terminal",style:  _biggerFont) ,
+                  Flexible(
+                    child:  TextField(
+                      controller: ageController,          
                     ),
                   ),
 
@@ -71,7 +81,7 @@ class AddWidget extends StatelessWidget {
                   FlatButton(
                     onPressed: () {
 
-                      Book entity=Book(0,titleController.text,"","",int.parse(pagesController.text),int.parse(usedCountController.text));
+                      Robot entity=Robot(0,nameController.text,specsController.text,int.parse(heightController.text),typeController.text,int.parse(ageController.text));
                       Navigator.pop(context,entity);
 
                     },

@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:http/http.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'MainList2.dart';
+import 'Oldest.dart';
 import 'crud/AddWidget.dart';
-import 'crud/DetailWidget.dart';
+
 import 'crud/SetName.dart';
 import 'domain/Book.dart';
+import 'domain/Robot.dart';
 import 'server/server.dart';
 import 'package:flutter/material.dart';
 import 'database/database.dart';
@@ -65,52 +68,37 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
               ),
             ),
             ListTile(
-              title: Text('Owner section'),
+              title: Text('Main section'),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: Text('Borrow section'),
+              title: Text('Oldest'),
               onTap: () {
                 if(connectivityResult!=ConnectivityResult.mobile && connectivityResult!=ConnectivityResult.wifi){
                   Navigator.pop(context);
                   showSnackBar(_context, "Please connect to the internet");
                 }
                 else{
-                // Navigator.push(context, MaterialPageRoute(
-                //   builder: (context) =>
-                //      Borrow()
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) =>
+                     Oldest()
                   
-                // ));
+                ));
                 
                 }
 
               },
             ),
-            ListTile(
-              title: Text('Reports section'),
-              onTap: () {
-                if(connectivityResult!=ConnectivityResult.mobile && connectivityResult!=ConnectivityResult.wifi){
-                  Navigator.pop(context);
-                  showSnackBar(_context, "Please connect to the internet");
-                }
-                else{
-                // Navigator.push(context, MaterialPageRoute(
-                //   builder: (context) =>
-                //      Reports()
-                  
-                // ));
-                }
-              },
-            ),
+            
           ],
         ),
         )
       ),
       
       floatingActionButton: Builder(builder: (context) => FloatingActionButton(
-        //onPressed : () => _add(context),
+        onPressed : () => _add(context),
         tooltip: 'Increment',
         child: const Icon(Icons.add),backgroundColor: Colors.green,
       )
@@ -139,9 +127,9 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
     channel.stream.listen((data) {
       print("Websocket works!!.Data: "+data.toString());
       Map userMap = jsonDecode(data);
-      var data_decoded = Book.fromMap(userMap);
+      var data_decoded = Robot.fromMap(userMap);
       //showSnackBar(__context, "Websocket works!!");
-      String message="A book was added. The book has the title: "+data_decoded.title+", it has: "+data_decoded.status.toString()+" pages and the usedCount is: "+data_decoded.usedCount.toString();
+      String message="A robot was added. The robot has id : "+data_decoded.id.toString()+", name: "+data_decoded.name.toString()+" specs:"+data_decoded.specs.toString()+" height:"+data_decoded.height.toString()+" type:"+data_decoded.type.toString()+" and age:"+data_decoded.age.toString();
       //customDialog(message,__context);
       //initState(() {});
       sync(__context);
@@ -289,58 +277,53 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
   }
   
   
-  // void _add(BuildContext context) async{
-  //   // Navigator.push returns a Future that completes after calling
-  //   // Navigator.pop on the AddPage Screen.
-  //   try{
-  //     final Book entity=await Navigator.push(context, MaterialPageRoute(
-  //                   builder: (context) =>
-  //                     AddWidget()
+  void _add(BuildContext context) async{
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the AddPage Screen.
+    try{
+      final Robot entity=await Navigator.push(context, MaterialPageRoute(
+                    builder: (context) =>
+                      AddWidget()
                     
-  //                 ));
+                  ));
     
       
-  //     if(entity!=null){
-  //       String student=await getRecord();
-  //       entity.setStudent(student);
-  //       int result = 0;
-  //       setProgressBar();
-  //       await db.addBorrowed(entity);
-  //       setProgressBar();
-  //       //_refreshList(context); 
-  //       if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-  //         setProgressBar();
-  //         try{
-  //           result= await Server.add(entity);
-  //         }
-  //         catch(exp){
-  //           print("__context here2 is: "+__context.toString());
-  //           showSnackBar(__context, exp.toString());
-  //         }
-  //         setProgressBar();
+      if(entity!=null){
+        int result = 0;
+        // setProgressBar();
+        // await db.add(entity);
+        // setProgressBar();
+        //_refreshList(context); 
+        if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+          setProgressBar();
+          try{
+            Response response= await Server.add(entity);
+            result=response.statusCode;
+            // int id=int.parse(response.body['id']);
+            db.add(entity);
+          }
+          catch(exp){
+            print("__context here2 is: "+__context.toString());
+            showSnackBar(__context, exp.toString());
+          }
+          setProgressBar();
           
-  //         print("result"+result.toString());
-  //       }
-  //       // sync(context);
-  //       if(result==200){
+          print("result"+result.toString());
+        }
 
-  //         showSnackBar(context,'The item was successfully created !');
-  //       }
-  //       else if(result!=404){
-  //         await db.addToAdd(entity);
-  //         //showSnackBar(context,'The item was successfully created !(locally)');
-  //       }
 
-  //       sync(context);
+        sync(context);
         
         
-  //     }
-  //   }
-  //   catch(exp){
-  //     showSnackBar(__context, exp.toString());
-  //   }
+      }
+    }
+    catch(exp){
+      showSnackBar(__context, exp.toString());
+    }
     
-  // }
+  }
+
+  
 
   void _detail(String entity,BuildContext context) async{
     // Navigator.push returns a Future that completes after calling

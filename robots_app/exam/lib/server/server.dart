@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:developer' as developer;
 import 'package:airport_manager/domain/Robot.dart';
+import 'package:http/http.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/widgets.dart';
@@ -22,10 +23,11 @@ class Server{
 
   Server._();
 
-  static Future<int> add(Book entity) async {
+  static Future<Response> add(Robot entity) async {
     try{
+      // List<int> res= List<int>();
     final http.Response response = await http.post(
-      new Uri.http(url, "/book"),
+      new Uri.http(url, "/robot"),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -40,7 +42,9 @@ class Server{
     //   "capacity": 93,
     );
     developer.log("add: add of "+entity.toString()+" to the server returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
-    return response.statusCode;
+    // res.add(response.statusCode);
+    // res.add(response.body.);
+    return response;
     }
     catch(exp){
       print(exp);
@@ -76,22 +80,52 @@ class Server{
     }
 
 
-  static Future<int> update(Book entity) async {
+  static Future<int> update(int id,int height) async {
     // print("aircraft: "+aircraft.toString());
     try{
-    final http.Response response = await http.put(
-      new Uri.http(url, "/aircraft"+"/"+ entity.id.toString()),
+      print("heii"+id.toString()+height.toString());
+    final http.Response response = await http.post(
+      new Uri.http(url, "/height"),
       headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-      body:  json.encode(entity.toMap())
+      body: json.encode(<String, dynamic> {
+        "id":id,
+        "height":height
+      })
     );
-    developer.log("update: update to "+entity.toString()+" returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
+    developer.log("update: update to "+height.toString()+" returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
     return response.statusCode;
     } 
     catch(exp) {
       print(exp);
-      developer.log("update: update to " + entity.toString()+" threw the following error: ",name: 'exam.server',
+      developer.log("update: update to " + height.toString()+" threw the following error: ",name: 'exam.server',
+        error: exp);
+      throw exp;
+
+  }
+  }
+
+  static Future<int> updateAge(int id,int age) async {
+    // print("aircraft: "+aircraft.toString());
+    try{
+      print("heii"+id.toString()+age.toString());
+    final http.Response response = await http.post(
+      new Uri.http(url, "/age"),
+      headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      body: json.encode(<String, dynamic> {
+        "id":id,
+        "age":age
+      })
+    );
+    developer.log("update: update to "+age.toString()+" returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
+    return response.statusCode;
+    } 
+    catch(exp) {
+      print(exp);
+      developer.log("update: update to " + age.toString()+" threw the following error: ",name: 'exam.server',
         error: exp);
       throw exp;
 
@@ -136,6 +170,33 @@ class Server{
     } catch(exp) {
         print(exp);
         developer.log("getAll: getAll threw the following error: ",name: 'exam.server',
+          error: exp);
+        throw(exp);
+    }
+  }
+  static Future<List<Robot>> getOldest() async {
+    try{
+      final response = await http.get(new Uri.http(url, '/old'));
+      List<Robot> entities = List<Robot>();
+      List<Robot> res = List<Robot>();
+      if (response.statusCode == 200) {
+        // If the server did return a 200 OK response,
+        // then parse the JSON.
+        for(Map<String, dynamic> aircraft in jsonDecode(response.body)){
+          print(aircraft['id']);
+          //aircrafts.add(Plane.fromMap(aircraft));
+          entities.add(Robot(aircraft['id'], aircraft['name'], aircraft['specs'], aircraft['height'], aircraft['type'], aircraft['age']));
+      }
+      entities.sort((a, b) => b.age.compareTo(a.age));
+      for(int i=0;i<10;i++){
+        res.add(entities[i]);
+      }
+      developer.log("getOldest: getOldest returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
+      return res;
+      }
+    } catch(exp) {
+        print(exp);
+        developer.log("getOldest: getOldest threw the following error: ",name: 'exam.server',
           error: exp);
         throw(exp);
     }

@@ -1,14 +1,17 @@
+
+
 import 'dart:async';
 import 'dart:convert';
 
 import 'package:airport_manager/domain/Robot.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'Oldest.dart';
+import 'MainList.dart';
 import 'crud/AddWidget.dart';
 
 import 'crud/SetName.dart';
 import 'crud/UpdateWidget.dart';
+import 'crud/UpdateWidget2.dart';
 import 'domain/Book.dart';
 import 'server/server.dart';
 import 'package:flutter/material.dart';
@@ -18,15 +21,14 @@ import 'package:connectivity/connectivity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:after_layout/after_layout.dart';
 
-class MainList2 extends StatefulWidget {
-  final String _type;
+class Oldest extends StatefulWidget {
 
-  MainList2(this._type);
+  Oldest();
   @override
-  _MainList2State createState() => _MainList2State(_type);
+  _OldestState createState() => _OldestState();
 }
 
-class _MainList2State extends State<MainList2> with AfterLayoutMixin<MainList2>{
+class _OldestState extends State<Oldest> with AfterLayoutMixin<Oldest>{
 
 
   @override
@@ -43,11 +45,7 @@ class _MainList2State extends State<MainList2> with AfterLayoutMixin<MainList2>{
         ),
 
         actions: <Widget>[
-                Builder(builder: (context) =>IconButton(
-                  icon: Icon(Icons.account_circle),
-                  onPressed: () { _detail(context); },
-                ),
-                ),
+                
                 Builder(builder: (context) =>IconButton(
                   icon: Icon(Icons.sync),
                   onPressed: () { sync(context); },
@@ -72,28 +70,24 @@ class _MainList2State extends State<MainList2> with AfterLayoutMixin<MainList2>{
             ListTile(
               title: Text('Main section'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) =>
+                     MainList()
+                  
+                ));
               },
             ),
             ListTile(
               title: Text('Oldest'),
               onTap: () {
-               if(connectivityResult!=ConnectivityResult.mobile && connectivityResult!=ConnectivityResult.wifi){
-                  Navigator.pop(context);
-                  showSnackBar(_context, "Please connect to the internet");
-                }
-                else{
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) =>
-                     Oldest()
-                  
-                ));
+                Navigator.pop(context);
+                 
                 
-                }
+                
 
               },
             ),
-            
+           
           ],
         ),
         )
@@ -111,7 +105,7 @@ class _MainList2State extends State<MainList2> with AfterLayoutMixin<MainList2>{
 
   @override
   void afterFirstLayout(BuildContext context){
-    _refreshList(__context);
+    sync(__context);
   }
 
 
@@ -125,9 +119,6 @@ class _MainList2State extends State<MainList2> with AfterLayoutMixin<MainList2>{
   var connectivityResult;
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
 
-  final String _type;
-
-  _MainList2State(this._type);
 
 
 void websocket(){
@@ -173,7 +164,10 @@ void websocket(){
         channel = IOWebSocketChannel.connect('ws://10.0.2.2:2202');
         websocket(); //start websocket
         print("aici");
+        setProgressBar();
         
+        
+        setProgressBar();
         await sync(context);
 
       }
@@ -184,30 +178,6 @@ void websocket(){
 
   void sync(BuildContext context) async{
     try{
-      connectivityResult=await connectivityResult;
-      print("try connectivityResult: "+connectivityResult.toString());
-      if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-          String student=await getRecord();
-          print("student: "+student);
-          setProgressBar();
-          List<Robot> entities_on_db = await db.getAll(_type);
-          List<Robot> entities_on_server = await Server.getAll(_type);
-          print("entities_on_server: "+entities_on_server.toString());
-          print("entities_on_db: "+entities_on_db.toString());
-          for (Robot entity in entities_on_db){
-            if (!entities_on_server.contains(entity)){
-                await db.delete(entity.id);
-            }
-          }
-
-          for (Robot entity in entities_on_server){
-            if (!entities_on_db.contains(entity)){
-                await db.add(entity);
-            }
-          }
-          setProgressBar();
-          
-      }
       
       _refreshList(context);
     }
@@ -223,7 +193,7 @@ void websocket(){
   _refreshList(BuildContext context) async {
     try{
       setProgressBar();
-      List<Robot> l=await db.getAll(_type);
+      List<Robot> l=await Server.getOldest();
       setProgressBar();
       setState(() {
         _entities = l;
@@ -333,22 +303,22 @@ void websocket(){
     
   // }
 
-  void _detail(BuildContext context) async{
+  void _detail(Robot entity,BuildContext context) async{
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the AddPage Screen.
     try{
       
-      final List<int> resultEntity=await Navigator.push(context, MaterialPageRoute(
+      final int resultEntity=await Navigator.push(context, MaterialPageRoute(
                     builder: (context) =>
-                      UpdateWidget()
+                      UpdateWidget2(entity)
                     
                   ));
       if(resultEntity!=null){
         // setState(() => _entities[_entities.indexOf(aircraft)] = resultAircraft); 
         
         if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
-          print("dada"+resultEntity[0].toString()+resultEntity[1].toString());
-          await Server.update(resultEntity[0],resultEntity[1]);
+          //print("dada"+resultEntity[0].toString()+resultEntity[1].toString());
+          await Server.updateAge(entity.id,resultEntity);
           sync(context);
         }
         
@@ -477,15 +447,18 @@ void websocket(){
 
     return ListTile(
       title: Text(
-        "id: "+entity.id.toString()+"\n"+
-        "name: "+entity.name.toString()+"\n",
+        
+        "name: "+entity.name.toString()+"\n"+
+        "specs: "+entity.specs.toString()+"\n"+
+        "type: "+entity.type.toString()+"\n"+
+        "age: "+entity.age.toString()+"\n",
         
         style: _biggerFont,
       ),
       
-    //   onTap: () {      
-    //     _detail(entity, context);
-    // },
+      onTap: () {      
+        _detail(entity, context);
+    },
 
     );
   }
