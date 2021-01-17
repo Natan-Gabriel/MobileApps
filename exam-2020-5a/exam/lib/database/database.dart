@@ -77,11 +77,11 @@ class Db{
         entity.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-      developer.log("add of "+entity.toString()+" to the db was successful",name: 'exam.db');
+      developer.log("add: add of "+entity.toString()+" to the db was successful",name: 'exam.db');
     }
     catch(exp){
       print(exp);
-      developer.log("add of "+entity.toString()+" threw the following error: ",name: 'exam.db',
+      developer.log("add: add of "+entity.toString()+" threw the following error: ",name: 'exam.db',
         error: exp);
       throw exp;
     }
@@ -105,11 +105,11 @@ class Db{
         entity.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-      developer.log("add of "+entity.toString()+" to the db was successful",name: 'exam.db');
+      developer.log("addToAdd: add of "+entity.toString()+" to the db was successful",name: 'exam.db');
     }
     catch(exp){
       print(exp);
-      developer.log("add of "+entity.toString()+" threw the following error: ",name: 'exam.db',
+      developer.log("addToAdd: add of "+entity.toString()+" threw the following error: ",name: 'exam.db',
         error: exp);
       throw exp;
     }
@@ -133,11 +133,11 @@ Future<void> addBorrowed(Book entity) async {
         entity.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-      developer.log("add of "+entity.toString()+" to the db was successful",name: 'exam.db');
+      developer.log("addBorrowed: add of "+entity.toString()+" to the db was successful",name: 'exam.db');
     }
     catch(exp){
       print(exp);
-      developer.log("add of "+entity.toString()+" threw the following error: ",name: 'exam.db',
+      developer.log("addBorrowed: add of "+entity.toString()+" threw the following error: ",name: 'exam.db',
         error: exp);
       throw exp;
     }
@@ -159,12 +159,12 @@ Future<void> addBorrowed(Book entity) async {
         // Pass the Dog's id as a whereArg to prevent SQL injection.
         whereArgs: [entity.id],
       );
-      developer.log("update to "+entity.toString()+" in the db was successful",name: 'exam.db');
+      developer.log("update: update to "+entity.toString()+" in the db was successful",name: 'exam.db');
 
     }
     catch(exp){
       print(exp);
-      developer.log("update to " + entity.toString()+" threw the following error: ",name: 'exam.db',
+      developer.log("update: update to " + entity.toString()+" threw the following error: ",name: 'exam.db',
         error: exp);
       throw exp;
     }
@@ -182,11 +182,11 @@ Future<void> addBorrowed(Book entity) async {
         // Pass the Dog's id as a whereArg to prevent SQL injection.
         whereArgs: [id],
       );
-      developer.log("entity having id "+id.toString()+" was successfully deleted",name: 'exam.db');
+      developer.log("delete: entity having id "+id.toString()+" was successfully deleted",name: 'exam.db');
     }
     catch(exp){
       print(exp);
-      developer.log("delete of plane with id "+id.toString() + "threw the following error: ",name: 'exam.db',
+      developer.log("delete: delete of plane with id "+id.toString() + "threw the following error: ",name: 'exam.db',
         error: exp);
       throw exp;
     }
@@ -205,11 +205,11 @@ Future<void> addBorrowed(Book entity) async {
         // Pass the Dog's id as a whereArg to prevent SQL injection.
         whereArgs: [id],
       );
-      developer.log("entity having id "+id.toString()+" was successfully deleted",name: 'exam.db');
+      developer.log("deleteToAdd: entity having id "+id.toString()+" was successfully deleted",name: 'exam.db');
     }
     catch(exp){
       print(exp);
-      developer.log("delete of plane with id "+id.toString() + "threw the following error: ",name: 'exam.db',
+      developer.log("deleteToAdd: delete of plane with id "+id.toString() + "threw the following error: ",name: 'exam.db',
         error: exp);
       throw exp;
     }
@@ -230,11 +230,11 @@ Future<void> addBorrowed(Book entity) async {
         // Pass the Dog's id as a whereArg to prevent SQL injection.
         whereArgs: [id],
       );
-      developer.log("entity having id "+id.toString()+" was successfully deleted",name: 'exam.db');
+      developer.log("entity having id "+id.toString()+" was successfully deleted(deleteBorrowed)",name: 'exam.db');
     }
     catch(exp){
       print(exp);
-      developer.log("delete of plane with id "+id.toString() + "threw the following error: ",name: 'exam.db',
+      developer.log("deleteBorrowed plane with id "+id.toString() + "threw the following error: ",name: 'exam.db',
         error: exp);
       throw exp;
     }
@@ -291,12 +291,12 @@ Future<void> addBorrowed(Book entity) async {
           maps[i]['usedCount']
         );
       });
-      developer.log("getAll call to the db was successful",name: 'exam.db');
+      developer.log("getAllToAdd call to the db was successful",name: 'exam.db');
       return res;
     }
     catch(exp){
       print(exp);
-      developer.log("getAll threw the following error: ",name: 'exam.db',
+      developer.log("getAllToAdd threw the following error: ",name: 'exam.db',
         error: exp);
       throw(exp);
     }

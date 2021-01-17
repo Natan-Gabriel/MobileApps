@@ -53,7 +53,7 @@ class Book {
 
   @override
   String toString() {
-    return 'Plane{id: $id, title: $title, status: $status,student: $student, pages: $pages, usedCount: $usedCount}';
+    return 'Entity{id: $id, title: $title, status: $status,student: $student, pages: $pages, usedCount: $usedCount}';
   }
 
 

@@ -177,7 +177,7 @@ class _MainListState extends State<MainList> {
         
         
         setProgressBar();
-         await sync(context);
+        await sync(context);
 
       }
     });
@@ -192,6 +192,7 @@ class _MainListState extends State<MainList> {
           List<Book> entities_on_db = await db.getAllBorrowed();
           List<Book> entities_on_server = await Server.getAllBorrowed(student);
           print("entities_on_server: "+entities_on_server.toString());
+          print("entities_on_db: "+entities_on_db.toString());
           for (Book entity in entities_on_db){
             if (!entities_on_server.contains(entity)){
                 db.deleteBorrowed(entity.id);
@@ -211,6 +212,9 @@ class _MainListState extends State<MainList> {
           _refreshList(context);
     }
     catch(exp){
+      if(_progressBarActive==true){
+        setProgressBar();
+      }
       showSnackBar(__context, exp.toString());
     }
   }
@@ -218,13 +222,21 @@ class _MainListState extends State<MainList> {
 
   _refreshList(BuildContext context) async {
     try{
-      setState(() {});
+      setProgressBar();
+      List<Book> l=await db.getAllBorrowed();
+      setProgressBar();
+      setState(() {
+        _entities = l;
+      });
       if(connectivityResult == ConnectivityResult.none){
         print("connectivityResult == ConnectivityResult.none");
         showSnackBar(__context,'The server connection is down.Retry using sync button');
       }
     }
     catch(exp){
+      if(_progressBarActive==true){
+        setProgressBar();
+      }
       showSnackBar(__context, exp.toString());
     }
   }
@@ -263,6 +275,7 @@ class _MainListState extends State<MainList> {
       if(str!=null){
           record(str);
         }
+      sync(__context);
         
         
         
@@ -289,7 +302,7 @@ class _MainListState extends State<MainList> {
         setProgressBar();
         db.addBorrowed(entity);
         setProgressBar();
-          _refreshList(context); 
+        _refreshList(context); 
         if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
           setProgressBar();
           try{
@@ -441,7 +454,8 @@ class _MainListState extends State<MainList> {
     Widget _buildList(BuildContext _context) {
     
       __context=_context;
-      ()async {setProgressBar(); List<Book> _entities = await db.getAllBorrowed();setProgressBar();};
+      //await ()async {setProgressBar(); _entities = await db.getAllBorrowed();setProgressBar();}
+      print("_entities aici: "+_entities.toString());
       //sync(__context);
     return ListView.builder(
       padding: const EdgeInsets.only(top:16,left:16,right:16,bottom: 80),
