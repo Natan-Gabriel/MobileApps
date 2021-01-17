@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:airport_manager/domain/Book.dart';
+import 'package:airport_manager/domain/Robot.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:flutter/material.dart';
@@ -60,12 +61,7 @@ class Db{
 
   
 
-  Future<void> add(Book entity) async {
-    // Directory dataDirectory=await getApplicationDocumentsDirectory();
-    // String dbPath = join(dataDirectory.path, _databaseName);
-    // print('db location : '+dbPath);
-    
-    // Get a reference to the database.
+  Future<void> add(Robot entity) async {
     try{
       Database db = await database;
 
@@ -74,7 +70,7 @@ class Db{
       //
       // In this case, replace any previous data.
       await db.insert(
-        'books',
+        'robots',
         entity.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
@@ -144,7 +140,7 @@ class Db{
 
       // Remove the Dog from the Database.
       await db.delete(
-        'books',
+        'robots',
         // Use a `where` clause to delete a specific dog.
         where: "id = ?",
         // Pass the Dog's id as a whereArg to prevent SQL injection.
@@ -211,23 +207,26 @@ class Db{
     }
   }
 
-  Future<List<Book>> getAll() async {
+  Future<List<Robot>> getAll(String _type) async {
 
     try{
       final Database db = await database;
 
       // Query the table for all The Dogs.
-      final List<Map<String, dynamic>> maps = await db.query('books');
+      final List<Map<String, dynamic>> maps = await db.query('robots',
+      where: "type = ?",
+        // Pass the Dog's id as a whereArg to prevent SQL injection.
+        whereArgs: [_type],);
 
       // Convert the List<Map<String, dynamic> into a List<Dog>.
-      List<Book> res=List.generate(maps.length, (i) {
-        return Book(
+      List<Robot> res=List.generate(maps.length, (i) {
+        return Robot(
           maps[i]['id'],
-          maps[i]['title'],
-          maps[i]['status'],
-          maps[i]['student'],
-          maps[i]['pages'],
-          maps[i]['usedCount']
+          maps[i]['name'],
+          maps[i]['specs'],
+          maps[i]['height'],
+          maps[i]['type'],
+          maps[i]['age']
         );
       });
       developer.log("getAll call to the db was successful and returned: "+res.toString(),name: 'exam.db');

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:airport_manager/domain/Robot.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'MainList2.dart';
 import 'crud/AddWidget.dart';
 import 'crud/DetailWidget.dart';
 import 'crud/SetName.dart';
@@ -16,12 +16,15 @@ import 'package:connectivity/connectivity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:after_layout/after_layout.dart';
 
-class MainList extends StatefulWidget {
+class MainList2 extends StatefulWidget {
+  final String _type;
+
+  MainList2(this._type);
   @override
-  _MainListState createState() => _MainListState();
+  _MainList2State createState() => _MainList2State(_type);
 }
 
-class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
+class _MainList2State extends State<MainList2> with AfterLayoutMixin<MainList2>{
 
 
   @override
@@ -121,7 +124,7 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
 
   @override
   void afterFirstLayout(BuildContext context){
-    _refreshList(context);
+    _refreshList(__context);
   }
 
 
@@ -130,10 +133,15 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
   BuildContext __context;
   Db db; 
   Server server;
-  List<String> _entities = [];  
+  List<Robot> _entities = [];  
   // List<Book> _toAdd = []; 
   var connectivityResult;
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
+
+  final String _type;
+
+  _MainList2State(this._type);
+
 
   void websocket(){
     channel.stream.listen((data) {
@@ -181,7 +189,6 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
         setProgressBar();
         
         
-        
         setProgressBar();
         await sync(context);
 
@@ -199,19 +206,19 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
           String student=await getRecord();
           print("student: "+student);
           setProgressBar();
-          List<String> entities_on_db = await db.getTypes();
-          List<String> entities_on_server = await Server.getTypes();
+          List<Robot> entities_on_db = await db.getAll(_type);
+          List<Robot> entities_on_server = await Server.getAll(_type);
           print("entities_on_server: "+entities_on_server.toString());
           print("entities_on_db: "+entities_on_db.toString());
-          for (String entity in entities_on_db){
+          for (Robot entity in entities_on_db){
             if (!entities_on_server.contains(entity)){
-                await db.deleteType(entity);
+                await db.delete(entity.id);
             }
           }
 
-          for (String entity in entities_on_server){
+          for (Robot entity in entities_on_server){
             if (!entities_on_db.contains(entity)){
-                await db.addType(entity);
+                await db.add(entity);
             }
           }
           setProgressBar();
@@ -232,7 +239,7 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
   _refreshList(BuildContext context) async {
     try{
       setProgressBar();
-      List<String> l=await db.getTypes();
+      List<Robot> l=await db.getAll(_type);
       setProgressBar();
       setState(() {
         _entities = l;
@@ -342,15 +349,34 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
     
   // }
 
-  void _detail(String entity,BuildContext context) async{
+  void _detail(Book entity,BuildContext context) async{
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the AddPage Screen.
     try{
-      await Navigator.push(context, MaterialPageRoute(
+      final Book resultEntity=await Navigator.push(context, MaterialPageRoute(
                     builder: (context) =>
-                      MainList2(entity)
+                      DetailWidget(entity)
                     
                   ));
+      if(resultEntity!=null){
+        // setState(() => _entities[_entities.indexOf(aircraft)] = resultAircraft); 
+        int result=0;
+        if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
+          result= await Server.update(resultEntity);
+        }
+        if(result==200){
+          setProgressBar();
+          await db.update(resultEntity);
+          setProgressBar();
+          //_refreshList(context); 
+          sync(__context);
+          showSnackBar(context,'The item was successfully updated !');
+        }
+        else{
+          showSnackBar(context,'This operation is not available offline!');
+        }
+
+      }
     }
     catch(exp){
       showSnackBar(__context, exp.toString());
@@ -471,29 +497,16 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
     );
   }
 
-  Widget _buildRow(String entity,BuildContext context) {
+  Widget _buildRow(Robot entity,BuildContext context) {
 
     return ListTile(
       title: Text(
-        "type: "+entity+"\n",
+        "id: "+entity.id.toString()+"\n"+
+        "name: "+entity.name.toString()+"\n",
         
         style: _biggerFont,
       ),
-      //isThreeLine: true,
-      // subtitle: Text("Terminal: "+aircraft.terminal+"\n"+
-      //   "Gate: "+aircraft.gate),
-
-    //   trailing: FlatButton(
-    //           onPressed: () { _showMyDialog(aircraft,context); },
-    //           child: Text(
-    //             "Delete",
-    //           ),
-    //           color: Colors.red,
-    //         ),
-
-      onTap: () {      
-        _detail(entity, context);
-    },
+      
 
     );
   }

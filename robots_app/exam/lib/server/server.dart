@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'dart:developer' as developer;
+import 'package:airport_manager/domain/Robot.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/widgets.dart';
@@ -115,10 +116,10 @@ class Server{
       
   }
 
-  static Future<List<Book>> getAll() async {
+  static Future<List<Robot>> getAll(String type) async {
     try{
-      final response = await http.get(new Uri.http(url, '/all'));
-      List<Book> entities = List<Book>();
+      final response = await http.get(new Uri.http(url, '/robots'+"/"+ type));
+      List<Robot> entities = List<Robot>();
 
       if (response.statusCode == 200) {
         // If the server did return a 200 OK response,
@@ -126,7 +127,7 @@ class Server{
         for(Map<String, dynamic> aircraft in jsonDecode(response.body)){
           print(aircraft['id']);
           //aircrafts.add(Plane.fromMap(aircraft));
-          entities.add(Book(aircraft['id'], aircraft['title'], aircraft['status'], aircraft['student'], aircraft['pages'], aircraft['usedCount']));
+          entities.add(Robot(aircraft['id'], aircraft['name'], aircraft['specs'], aircraft['height'], aircraft['type'], aircraft['age']));
       }
       //entities.sort((a, b) => a.size.compareTo(b.size));
       developer.log("getAll: getAll returned the status code "+response.statusCode.toString()+" and the body "+response.body.toString(),name: 'exam.server');
