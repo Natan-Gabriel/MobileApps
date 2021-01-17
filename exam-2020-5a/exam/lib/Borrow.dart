@@ -203,7 +203,7 @@ class _BorrowState extends State<Borrow> {
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(
                   builder: (context) =>
-                     new MainList()
+                    MainList()
                   
                 ));
                 

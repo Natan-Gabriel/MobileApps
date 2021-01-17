@@ -124,12 +124,11 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
   }
 
   @override
-  void afterFirstLayout(BuildContext context) async{
+  void afterFirstLayout(BuildContext context){
     print("afterFirstLayout");
     // Calling the same function "after layout" to resolve the issue.
-    await sync(__context);
-    print("afterFirstLayout finished"
-    );
+    _refreshList(context);
+    print("afterFirstLayout finished");
   }
 
 
@@ -171,6 +170,7 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
   @override
   void initState() {
     super.initState();
+    
     db = Db.instance;
     server =new Server(); 
 
@@ -213,6 +213,8 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
 
   void sync(BuildContext context) async{
     try{
+      connectivityResult=await connectivityResult;
+      print("try connectivityResult: "+connectivityResult.toString());
       if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
           String student=await getRecord();
           print("student: "+student);
@@ -486,7 +488,7 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
     
       __context=_context;
       //await ()async {setProgressBar(); _entities = await db.getAllBorrowed();setProgressBar();}
-      print("_entities aici: "+_entities.toString());
+      //print("_entities aici: "+_entities.toString());
       //sync(__context);
     return ListView.builder(
       padding: const EdgeInsets.only(top:16,left:16,right:16,bottom: 80),
