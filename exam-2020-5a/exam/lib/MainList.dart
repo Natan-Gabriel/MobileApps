@@ -326,15 +326,17 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
           
           print("result"+result.toString());
         }
-        sync(context);
+        // sync(context);
         if(result==200){
 
           showSnackBar(context,'The item was successfully created !');
         }
-        else{
+        else if(result!=404){
           await db.addToAdd(entity);
           //showSnackBar(context,'The item was successfully created !(locally)');
         }
+
+        sync(context);
         
         
       }
