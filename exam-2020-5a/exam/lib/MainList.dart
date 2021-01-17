@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:web_socket_channel/io.dart';
@@ -14,14 +15,17 @@ import 'database/database.dart';
 import 'dart:developer' as developer;
 import 'package:connectivity/connectivity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:after_layout/after_layout.dart';
 
 class MainList extends StatefulWidget {
   final channel = IOWebSocketChannel.connect('ws://10.0.2.2:2501');
+  StreamController<String> streamController = new StreamController.broadcast(); 
   @override
-  _MainListState createState() => _MainListState(channel:channel);
+  // _MainListState createState() => _MainListState(channel:channel);
+  _MainListState createState() => _MainListState();
 }
 
-class _MainListState extends State<MainList> {
+class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
 
 
   @override
@@ -29,7 +33,7 @@ class _MainListState extends State<MainList> {
 
     return Scaffold (                    
       appBar: AppBar(
-        title: Text('Registration'),
+        title: Text('Owner Section'),
         bottom: PreferredSize(
                   preferredSize: Size(double.infinity, 1.0),
                   child: _progressBarActive == true?const LinearProgressIndicator(
@@ -108,7 +112,7 @@ class _MainListState extends State<MainList> {
         ),
         )
       ),
-
+      
       floatingActionButton: Builder(builder: (context) => FloatingActionButton(
         onPressed : () => _add(context),
         tooltip: 'Increment',
@@ -119,9 +123,19 @@ class _MainListState extends State<MainList> {
     );                                      
   }
 
+  @override
+  void afterFirstLayout(BuildContext context) async{
+    print("afterFirstLayout");
+    // Calling the same function "after layout" to resolve the issue.
+    await sync(__context);
+    print("afterFirstLayout finished"
+    );
+  }
+
 
   bool _progressBarActive = false;
-  final WebSocketChannel channel;
+  // final WebSocketChannel channel;
+  IOWebSocketChannel channel;// = IOWebSocketChannel.connect('ws://10.0.2.2:2501');
   BuildContext __context;
   Db db; 
   Server server;
@@ -131,22 +145,28 @@ class _MainListState extends State<MainList> {
   final TextStyle _biggerFont = const TextStyle(fontSize: 18); // NEW
  
 
-  _MainListState({this.channel}) {
+ // _MainListState({this.channel}){websocket();}
+ //_MainListState(){websocket();}
+
+  void websocket(){
     channel.stream.listen((data) {
       print("Websocket works!!.Data: "+data.toString());
       Map userMap = jsonDecode(data);
       var data_decoded = Book.fromMap(userMap);
       //showSnackBar(__context, "Websocket works!!");
-      String message="Another user just added a book. The book has the title: "+data_decoded.title+", it has: "+data_decoded.status.toString()+" pages and the usedCount is: "+data_decoded.usedCount.toString();
+      String message="A book was added. The book has the title: "+data_decoded.title+", it has: "+data_decoded.status.toString()+" pages and the usedCount is: "+data_decoded.usedCount.toString();
       //customDialog(message,__context);
       //initState(() {});
       sync(__context);
       print("__context here1 is: "+__context.toString());
       //customDialog(message,__context);
       showSnackBar(__context, message);
-    });
+    },
+    onDone: () {
+          print('ws channel closed');
+        },
+    );
   }
-
   
   @override
   void initState() {
@@ -154,25 +174,27 @@ class _MainListState extends State<MainList> {
     db = Db.instance;
     server =new Server(); 
 
-    sync(__context);
-
     connectivityResult= Connectivity().checkConnectivity();
 
     connectivityResult.then((data){
       connectivityResult=data;
     });
 
+    sync(__context);
+
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
     // Got a new connectivity status!
       print("Connectivity: " + result.toString());
       connectivityResult=result;
       if(result==ConnectivityResult.mobile || result==ConnectivityResult.wifi){  
+        channel = IOWebSocketChannel.connect('ws://10.0.2.2:2501');
+        websocket(); //start websocket
         print("aici");
         setProgressBar();
         _toAdd=await db.getAllToAdd();
         for (Book entity in _toAdd){
             Server.add(entity);
-            db.deleteToAdd(entity.id);
+            await db.deleteToAdd(entity.id);
         }
         
         
@@ -180,14 +202,20 @@ class _MainListState extends State<MainList> {
         await sync(context);
 
       }
+      // else{
+      //   channel.sink.close();
+      //   super.dispose();
+      // }
     });
   
   }
+  
 
   void sync(BuildContext context) async{
     try{
       if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
           String student=await getRecord();
+          print("student: "+student);
           setProgressBar();
           List<Book> entities_on_db = await db.getAllBorrowed();
           List<Book> entities_on_server = await Server.getAllBorrowed(student);
@@ -195,21 +223,20 @@ class _MainListState extends State<MainList> {
           print("entities_on_db: "+entities_on_db.toString());
           for (Book entity in entities_on_db){
             if (!entities_on_server.contains(entity)){
-                db.deleteBorrowed(entity.id);
+                await db.deleteBorrowed(entity.id);
             }
           }
 
           for (Book entity in entities_on_server){
             if (!entities_on_db.contains(entity)){
-                db.addBorrowed(entity);
+                await db.addBorrowed(entity,online: 1);
             }
           }
           setProgressBar();
           
       }
-
-          
-          _refreshList(context);
+      
+      _refreshList(context);
     }
     catch(exp){
       if(_progressBarActive==true){
@@ -294,15 +321,16 @@ class _MainListState extends State<MainList> {
                       AddWidget()
                     
                   ));
-      String student=await getRecord();
-      entity.setStudent(student);
+    
       
       if(entity!=null){
+        String student=await getRecord();
+        entity.setStudent(student);
         int result = 0;
         setProgressBar();
-        db.addBorrowed(entity);
+        await db.addBorrowed(entity);
         setProgressBar();
-        _refreshList(context); 
+        //_refreshList(context); 
         if(connectivityResult==ConnectivityResult.mobile || connectivityResult==ConnectivityResult.wifi){
           setProgressBar();
           try{
@@ -316,6 +344,7 @@ class _MainListState extends State<MainList> {
           
           print("result"+result.toString());
         }
+        sync(context);
         if(result==200){
 
           showSnackBar(context,'The item was successfully created !');
@@ -351,9 +380,10 @@ class _MainListState extends State<MainList> {
         }
         if(result==200){
           setProgressBar();
-          db.update(resultEntity);
+          await db.update(resultEntity);
           setProgressBar();
-          _refreshList(context); 
+          //_refreshList(context); 
+          sync(__context);
           showSnackBar(context,'The item was successfully updated !');
         }
         else{
@@ -437,7 +467,8 @@ class _MainListState extends State<MainList> {
                 }
                 if(result==200){
                   //db.delete(aircraft.id);
-                  _refreshList(_context);
+                  //_refreshList(_context);
+                  sync(__context);
                   showSnackBar(_context, 'The operation was successfully !'); 
                 }
                 else{

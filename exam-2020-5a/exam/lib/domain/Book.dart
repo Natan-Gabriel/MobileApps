@@ -8,11 +8,21 @@ class Book {
    String student;
    int pages;
    int usedCount;
-
+   
   Book(this.id, this.title,this.status,this.student,this.pages,this.usedCount);
 
   void setStudent(String s){
     student=s;
+  }
+
+  Map<String, dynamic> toLocalMap() {
+    return {
+      'title': title,
+      'status': 'available',
+      'student': student,
+      'pages': pages,
+      'usedCount': usedCount,
+    };
   }
 
   Map<String, dynamic> toMap() {

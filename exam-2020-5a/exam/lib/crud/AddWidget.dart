@@ -28,13 +28,13 @@ class AddWidget extends StatelessWidget {
               
               children: <Widget>[  
 
-                  Padding(padding:new EdgeInsets.only(top: 10),child:Text("Id",style:  _biggerFont) ),
-                  // Text("Tail number",style:  _biggerFont) ,
-                  Flexible(
-                    child:  TextField(
-                      controller: idController,          
-                    ),
-                  ),
+                  // Padding(padding:new EdgeInsets.only(top: 10),child:Text("Id",style:  _biggerFont) ),
+                  // // Text("Tail number",style:  _biggerFont) ,
+                  // Flexible(
+                  //   child:  TextField(
+                  //     controller: idController,          
+                  //   ),
+                  // ),
                   
                   Padding(padding:new EdgeInsets.only(top: 10),child:Text("Title",style:  _biggerFont) ),
                   Flexible(
@@ -43,12 +43,12 @@ class AddWidget extends StatelessWidget {
                     ),
                   ),
 
-                  Padding(padding:new EdgeInsets.only(top: 10),child:Text("Status",style:  _biggerFont) ),
-                  Flexible(
-                    child:  TextField(
-                      controller: statusController,          
-                    ),
-                  ),
+                  // Padding(padding:new EdgeInsets.only(top: 10),child:Text("Status",style:  _biggerFont) ),
+                  // Flexible(
+                  //   child:  TextField(
+                  //     controller: statusController,          
+                  //   ),
+                  // ),
 
                   Text("pages",style:  _biggerFont) ,
                   Flexible(
@@ -71,7 +71,7 @@ class AddWidget extends StatelessWidget {
                   FlatButton(
                     onPressed: () {
 
-                      Book entity=Book(int.parse(idController.text),titleController.text,statusController.text,"",int.parse(pagesController.text),int.parse(usedCountController.text));
+                      Book entity=Book(0,titleController.text,"","",int.parse(pagesController.text),int.parse(usedCountController.text));
                       Navigator.pop(context,entity);
 
                     },

@@ -25,6 +25,7 @@ class Db{
 
   static const _databaseName = 'bookv4.db';
   static const _databaseVersion = 1;
+  
 
   Db._();
   static final Db instance = Db._();
@@ -102,7 +103,7 @@ class Db{
       // In this case, replace any previous data.
       await db.insert(
         'toAdd',
-        entity.toMap(),
+        entity.toLocalMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
       developer.log("addToAdd: add of "+entity.toString()+" to the db was successful",name: 'exam.db');
@@ -115,7 +116,7 @@ class Db{
     }
 }
 
-Future<void> addBorrowed(Book entity) async {
+Future<void> addBorrowed(Book entity,{int online=0}) async {
     // Directory dataDirectory=await getApplicationDocumentsDirectory();
     // String dbPath = join(dataDirectory.path, _databaseName);
     // print('db location : '+dbPath);
@@ -128,11 +129,20 @@ Future<void> addBorrowed(Book entity) async {
       // `conflictAlgorithm` to use in case the same dog is inserted twice.
       //
       // In this case, replace any previous data.
-      await db.insert(
-        'borrowed',
-        entity.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      if(online==0){
+        await db.insert(
+          'borrowed',
+          entity.toLocalMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+      else{
+        await db.insert(
+          'borrowed',
+          entity.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
       developer.log("addBorrowed: add of "+entity.toString()+" to the db was successful",name: 'exam.db');
     }
     catch(exp){
@@ -291,6 +301,7 @@ Future<void> addBorrowed(Book entity) async {
           maps[i]['usedCount']
         );
       });
+      print("getAllToAdd returned: "+res.toString());
       developer.log("getAllToAdd call to the db was successful",name: 'exam.db');
       return res;
     }
