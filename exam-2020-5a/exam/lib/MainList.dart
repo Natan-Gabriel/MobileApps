@@ -169,7 +169,7 @@ class _MainListState extends State<MainList> with AfterLayoutMixin<MainList>{
       connectivityResult=data;
     });
 
-    sync(__context);
+    //sync(__context);
 
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
     // Got a new connectivity status!
